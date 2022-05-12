@@ -33,7 +33,9 @@ jobs:
           cmake --build .
 
       - name: Test
-        run: ctest -C debug
+        run: |
+          cd build
+          ctest -C debug
 
   macOS:
     name: CI for macOS
@@ -61,7 +63,9 @@ jobs:
           ninja
 
       - name: Test
-        run: ctest -C debug
+        run: |
+          cd build
+          ctest -C debug
 
   linux:
     name: CI for Linux
@@ -89,4 +93,6 @@ jobs:
           ninja
 
       - name: Test
-        run: ctest -C debug
+        run: |
+          cd build
+          ctest -C debug
