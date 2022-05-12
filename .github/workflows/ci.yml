@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  windows:
+    name: CI for Windows
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build .
+
+      - name: Test
+        run: ctest -C debug
+
+  macOS:
+    name: CI for macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Ninja
+        run: brew install ninja
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake -GNinja ..
+
+      - name: Build
+        run: |
+          cd build
+          ninja
+
+      - name: Test
+        run: ctest -C debug
+
+  linux:
+    name: CI for Linux
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake -GNinja ..
+
+      - name: Build
+        run: |
+          cd build
+          ninja
+
+      - name: Test
+        run: ctest -C debug

@@ -1,0 +1,39 @@
+cmake_minimum_required (VERSION 3.15.0)
+
+enable_language(CXX)
+enable_testing()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+project(dermtiff)
+
+if (MSVC)
+	set(CMAKE_CXX_FLAGS "/W4 /EHsc")
+else()
+	set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas")
+endif()
+
+
+set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/../bin")
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
+
+add_subdirectory("deps/libtiff")
+add_subdirectory("libdermtiff")
+add_subdirectory("test")
+
+find_package(OpenMP)
