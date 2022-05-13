@@ -9,8 +9,8 @@ include_directories(
 )
 
 add_library(dermtiff STATIC
+    "./src/io.cpp"
     "./src/pencil.cpp"
-    "./src/tiffio.cpp"
     "./src/type.cpp"
     "./src/util.cpp"
 )

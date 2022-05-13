@@ -1,4 +1,4 @@
-#include "tiffio.hpp"
+#include "io.hpp"
 
 #include <libtiff/tiffio.h>
 
