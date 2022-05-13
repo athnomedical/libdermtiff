@@ -64,26 +64,6 @@ bool read(const std::string& path, const std::optional<ldt::Pencil>& pencil = st
     return false;
 }
 
-Image makeImage(uint32_t width, uint32_t height) {
-    Image image(width * height);
-    const auto w = static_cast<int>(width), h = static_cast<int>(height);
-    const auto size = w + h;
-
-#pragma omp parallel for
-    for (int y = 0; y < h; y++) {
-#pragma omp parallel for
-        for (int x = 0; x < w; x++) {
-            const auto index = y * width + x;
-            image[index].r   = static_cast<uint8_t>(255.0 * (x + y) / size);
-            image[index].g   = static_cast<uint8_t>(255.0 * x / w);
-            image[index].b   = static_cast<uint8_t>(255.0 * y / h);
-            image[index].a   = 255;
-        }
-    }
-
-    return image;
-}
-
 std::string getOutPath() {
     static int i = 0;
     return "../test/out/out" + std::to_string(i++) + ".tiff";
@@ -113,13 +93,13 @@ int main() {
 
     {
         const uint32_t width = 255, height = 255;
-        Image image = makeImage(width, height);
+        Image image(width * height);
         TestWriteRead(true, true, width, height, image);
     }
 
     {
         const uint32_t width = 255, height = 255;
-        Image image = makeImage(width, height);
+        Image image(width * height);
         ldt::Pencil pencil;
         pencil.name = "";
         TestWriteReadPencil(false, false, width, height, image, pencil);
@@ -127,7 +107,7 @@ int main() {
 
     {
         const uint32_t width = 255, height = 255;
-        Image image = makeImage(width, height);
+        Image image(width * height);
         ldt::Pencil pencil;
         pencil.name = "pencil";
         TestWriteReadPencil(true, true, width, height, image, pencil);
@@ -147,7 +127,7 @@ int main() {
 
     {
         const uint32_t width = ldt::DermTIFF::MaxWidth, height = ldt::DermTIFF::MaxHeight;
-        Image image = makeImage(width, height);
+        Image image(width * height);
         TestWriteRead(true, true, width, height, image);
     }
 

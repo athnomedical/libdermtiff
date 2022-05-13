@@ -35,5 +35,3 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
 add_subdirectory("deps/libtiff")
 add_subdirectory("libdermtiff")
 add_subdirectory("test")
-
-find_package(OpenMP)
