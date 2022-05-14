@@ -35,7 +35,7 @@ jobs:
       - name: Test
         run: |
           cd build
-          ctest -C debug
+          ctest -C debug --test-dir test/
 
   macOS:
     name: CI for macOS
@@ -65,7 +65,7 @@ jobs:
       - name: Test
         run: |
           cd build
-          ctest -C debug
+          ctest -C debug --test-dir test/
 
   linux:
     name: CI for Linux
@@ -95,4 +95,4 @@ jobs:
       - name: Test
         run: |
           cd build
-          ctest -C debug
+          ctest -C debug --test-dir test/
