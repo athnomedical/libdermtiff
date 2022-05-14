@@ -7,6 +7,7 @@ This requires C++17 or later.
 ## Build
 
 ```sh
+bash scripts/setup_macos.sh         # If you are using macOS
 mkdir build/
 cd build/
 cmake ..                            # Configure

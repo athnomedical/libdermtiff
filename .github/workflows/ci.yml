@@ -48,6 +48,9 @@ jobs:
       - name: Update submodule
         run: git submodule update --init --recursive
 
+      - name: Setup
+        run: bash scripts/setup_macos.sh
+
       - name: Install Ninja
         run: brew install ninja
 
