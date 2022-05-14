@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(dermtiff)
+set(CMAKE_PROJECT_VERSION_MAJOR 0)
+set(CMAKE_PROJECT_VERSION_MINOR 1)
+set(CMAKE_PROJECT_VERSION_PATCH 0)
 
 if (MSVC)
 	set(CMAKE_CXX_FLAGS "/W4 /EHsc")
@@ -15,9 +18,8 @@ else()
 	set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas")
 endif()
 
+set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
-set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/../bin")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
