@@ -39,11 +39,12 @@ int main() {
     assert(testLibTiffImage("rgb-3c-16b"));
     assert(testLibTiffImage("testfax4"));
 
-    assert(!testLibTiffImage("deflate-last-strip-extra-data"));            // deflate compression is not supported
-    assert(!testLibTiffImage("quad-tile.jpg"));                            // jpeg compression is not supported
-    assert(!testLibTiffImage("ojpeg_chewey_subsamp21_multi_strip"));       // old-jpeg compression is not supported
-    assert(!testLibTiffImage("ojpeg_single_strip_no_rowsperstrip"));       // old-jpeg compression is not supported
-    assert(!testLibTiffImage("ojpeg_zackthecat_subsamp22_single_strip"));  // old-jpeg compression is not supported
+    // The following tests depend on the build environment.
+    // assert(!testLibTiffImage("deflate-last-strip-extra-data"));            // deflate compression is not supported
+    // assert(!testLibTiffImage("quad-tile.jpg"));                            // jpeg compression is not supported
+    // assert(!testLibTiffImage("ojpeg_chewey_subsamp21_multi_strip"));       // old-jpeg compression is not supported
+    // assert(!testLibTiffImage("ojpeg_single_strip_no_rowsperstrip"));       // old-jpeg compression is not supported
+    // assert(!testLibTiffImage("ojpeg_zackthecat_subsamp22_single_strip"));  // old-jpeg compression is not supported
 
     return 0;
 }
