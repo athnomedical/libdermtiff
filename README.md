@@ -9,9 +9,9 @@ This requires C++17 or later.
 ```sh
 mkdir build/
 cd build/
-cmake ..        # Configure
-cmake --build . # Build libdermtiff and its dependencies
-ctest -C debug  # Run test
+cmake ..                            # Configure
+cmake --build .                     # Build libdermtiff and its dependencies
+ctest -C debug --test-dir test/     # Run libdermtiff tests
 ```
 
 ## Usage
