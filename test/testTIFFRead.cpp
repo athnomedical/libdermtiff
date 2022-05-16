@@ -24,6 +24,30 @@ bool testLibTiffImage(const std::string& filename) {
     return false;
 }
 
+bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Pencil>& pencils) {
+    const auto path = "../test/images/" + filename + ".tiff";
+    std::cout << "-------------------------------------------------" << std::endl;
+    std::cout << "Test DermAnnotation TIFF images: " << path << std::endl;
+    if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
+        std::vector<ldt::Pencil> tiffPencils(dermTiff.pages);
+        for (uint16_t page = 0; page < dermTiff.pages; page++) {
+            Image raster(dermTiff.width * dermTiff.height);
+            if (!ldt::ReadPage(path, page, reinterpret_cast<uint32_t*>(raster.data()), &tiffPencils[page])) {
+                return false;
+            }
+        }
+
+        // validate pencils
+        for (size_t i = 1; i < tiffPencils.size(); i++) {
+            if (tiffPencils[i] != pencils[i - 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 int main() {
     assert(testLibTiffImage("logluv-3c-16b"));
     assert(testLibTiffImage("lzw-single-strip"));
@@ -38,6 +62,9 @@ int main() {
     assert(testLibTiffImage("rgb-3c-8b"));
     assert(testLibTiffImage("rgb-3c-16b"));
     assert(testLibTiffImage("testfax4"));
+
+    assert(testDermTiffImage(
+        "v1", {{"white", 255, 255, 255}, {"red", 255, 0, 0}, {"green", 0, 255, 0}, {"blue", 0, 0, 255}}));
 
     // The following tests depend on the build environment.
     // assert(!testLibTiffImage("deflate-last-strip-extra-data"));            // deflate compression is not supported
