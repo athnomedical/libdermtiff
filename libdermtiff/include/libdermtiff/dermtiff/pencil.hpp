@@ -12,5 +12,13 @@ namespace ldt {
         static std::optional<Pencil> Parse(const std::string& str);
 
         std::optional<std::string> toString() const;
+
+        bool operator==(const Pencil& other) const {
+            return name == other.name && r == other.r && g == other.g && b == other.b;
+        }
+
+        bool operator!=(const Pencil& other) const {
+            return !(*this == other);
+        }
     };
 }
