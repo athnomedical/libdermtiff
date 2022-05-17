@@ -38,8 +38,8 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
         }
 
         // Read layers
-        std::vector<ldt::Pencil> tiffPencils(dermTiff.pages - 1);
-        for (uint16_t layerIndex = 0; layerIndex < dermTiff.pages - 1; layerIndex++) {
+        std::vector<ldt::Pencil> tiffPencils(dermTiff.layerCount);
+        for (uint16_t layerIndex = 0; layerIndex < dermTiff.layerCount; layerIndex++) {
             if (!ldt::ReadLayer(
                     path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &tiffPencils[layerIndex])) {
                 return false;
