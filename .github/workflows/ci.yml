@@ -20,6 +20,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup
+        run: .\scripts\windows\setup.ps1
+
       - name: Configure
         run: |
           mkdir build
@@ -45,7 +48,7 @@ jobs:
           submodules: recursive
 
       - name: Setup
-        run: bash scripts/setup_macos.sh
+        run: zsh scripts/macos/setup.sh
 
       - name: Install Ninja
         run: brew install ninja
@@ -73,6 +76,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+
+      - name: Setup
+        run: bash scripts/linux/setup.sh
 
       - name: Install Ninja
         run: sudo apt install ninja-build
