@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: recuesive
+          submodules: recursive
 
       - name: Setup
         run: .\scripts\windows\setup.ps1
@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: recuesive
+          submodules: recursive
 
       - name: Setup
         run: zsh scripts/macos/setup.sh
@@ -75,7 +75,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: recuesive
+          submodules: recursive
 
       - name: Setup
         run: bash scripts/linux/setup.sh
