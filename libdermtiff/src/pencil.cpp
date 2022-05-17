@@ -4,6 +4,30 @@
 #include <sstream>
 
 namespace ldt {
+    namespace _internal {
+        void ltrim(std::string& str, const std::string& trimChars) {
+            if (!str.empty()) {
+                const size_t pos = str.find_first_not_of(trimChars);
+                str              = str.substr(pos, str.length() - pos);
+            }
+        }
+
+        void rtrim(std::string& str, const std::string& trimChars) {
+            if (!str.empty()) {
+                const size_t pos = str.find_last_not_of(trimChars);
+                str              = str.substr(0, pos + 1);
+            }
+        }
+
+        void trim(std::string& str, const std::string& trimChars) {
+            _internal::ltrim(str, trimChars);
+            _internal::rtrim(str, trimChars);
+        }
+
+        void trimSpaces(std::string& str) {
+            _internal::trim(str, " 　");  // Half-width space and full-width space
+        }
+    }
     std::optional<Pencil> Pencil::Parse(const std::string& str) {
         Pencil pencil;
 
@@ -13,12 +37,15 @@ namespace ldt {
         }
 
         pencil.name = str.substr(0, index);
+        _internal::trimSpaces(pencil.name);
         if (pencil.name.empty()) {
             return std::nullopt;
         }
 
         try {
-            const auto colorString = str.substr(index + 2, str.length() - index - 1);  // ignore '(' and ')'
+            auto colorString = str.substr(index + 1, str.length() - index);
+            _internal::trimSpaces(colorString);
+            _internal::trim(colorString, "()");
             std::stringstream stream{colorString};
             std::string buf;
             size_t count = 0;
@@ -43,7 +70,7 @@ namespace ldt {
 
             return pencil;
         } catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
+            std::cerr << "Exception while parsing pencil: " << e.what() << std::endl;
             return std::nullopt;
         }
     }
