@@ -19,18 +19,35 @@ namespace ldt {
         LEFTBOT,
     };
 
-    // try to open tiff file
+    // Try to open tiff file
     DermTIFF Open(const std::string& filepath);
 
-    // raster should be uint32[width * height]
+    // Read the specific page
+    // - Page 0		: Original image
+    // - Page 1...	: Layers
+    // Raster should be uint32[width * height]
     bool ReadPage(const std::string& filepath,
                   uint16_t page,
                   uint32_t* raster,
                   Pencil* pencil,
                   Orientation orientation = Orientation::LEFTTOP);
 
-    // raster should be uint32[width * height]
-    // samples per pixel is 4
+    // Read the original image of dermtiff
+    // Raster should be uint32[width * height]
+    bool ReadOriginalImage(const std::string& filepath,
+                           uint32_t* raster,
+                           Orientation orientation = Orientation::LEFTTOP);
+
+    // Read the specific layer of dermtiff
+    // Raster should be uint32[width * height]
+    bool ReadLayer(const std::string& filepath,
+                   uint16_t layerIndex,
+                   uint32_t* raster,
+                   Pencil* pencil,
+                   Orientation orientation = Orientation::LEFTTOP);
+
+    // Raster should be uint32[width * height]
+    // Samples per pixel is 4
     bool WriteTIFF(const std::string& filepath,
                    uint16_t pageCount,
                    uint32_t width,
