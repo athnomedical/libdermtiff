@@ -49,9 +49,9 @@ namespace ldt {
     // Raster should be uint32[width * height]
     // Samples per pixel is 4
     bool WriteTIFF(const std::string& filepath,
-                   uint16_t pageCount,
+                   uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,
-                   uint32_t* raster[],
-                   Pencil pencil[]);
+                   uint32_t* rasters[],
+                   Pencil pencils[]);
 }

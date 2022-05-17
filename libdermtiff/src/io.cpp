@@ -80,18 +80,20 @@ namespace ldt {
     }
 
     bool WriteTIFF(const std::string& filepath,
-                   uint16_t pageCount,
+                   uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,
-                   uint32_t* raster[],
-                   Pencil pencil[]) {
+                   uint32_t* rasters[],
+                   Pencil pencils[]) {
+        const auto pageCount = layerCount + 1;
+
         // check parameters
         if (width > DermTIFF::MaxWidth || height > DermTIFF::MaxHeight) {
             return false;
         }
-        for (uint16_t i = 0; i < pageCount; i++) {
+        for (uint16_t i = 0; i < layerCount; i++) {
             // layer has pencil with empty name
-            if (i != 0 && !pencil[i].toString().has_value()) {
+            if (!pencils[i].toString().has_value()) {
                 return false;
             }
         }
@@ -110,7 +112,7 @@ namespace ldt {
                 }
                 // layers
                 else {
-                    const auto penStr = pencil[page].toString();
+                    const auto penStr = pencils[page - 1].toString();
                     if (!penStr.has_value()
                         || !_internal::writer::TIFFSetDefaultFields(tiff, width, height, page, pageCount)
                         || TIFFSetField(tiff, TIFFTAG_PAGENAME, penStr.value().c_str()) != 1) {
@@ -118,7 +120,7 @@ namespace ldt {
                     }
                 }
 
-                _internal::writer::WriteImage(tiff, width, height, &*(raster[page]));
+                _internal::writer::WriteImage(tiff, width, height, &*(rasters[page]));
 
                 TIFFWriteDirectory(tiff);
             }
