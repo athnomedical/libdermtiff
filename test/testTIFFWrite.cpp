@@ -41,24 +41,18 @@ bool writeWithPencil(
 bool read(const std::string& path, const std::optional<ldt::Pencil>& pencil = std::nullopt) {
     if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
         Image raster(dermTiff.width * dermTiff.height);
-        ldt::Pencil p;
         // read layer
         if (pencil.has_value()) {
-            if (ldt::ReadPage(path, 1, reinterpret_cast<uint32_t*>(raster.data()), &p)) {
+            if (ldt::Pencil p; ldt::ReadLayer(path, 0, reinterpret_cast<uint32_t*>(raster.data()), &p)) {
                 // compare pencil
-                if (pencil.has_value()) {
-                    return p.name == pencil.value().name && p.r == pencil.value().r && p.g == pencil.value().g
-                           && p.b == pencil.value().b && p.a == pencil.value().a;
-                } else {
-                    return true;
-                }
+                return p == pencil.value();
             } else {
                 return false;
             }
         }
         // read original image
         else {
-            return ldt::ReadPage(path, 0, reinterpret_cast<uint32_t*>(raster.data()), &p);
+            return ldt::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()));
         }
     }
     return false;
