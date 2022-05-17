@@ -5,14 +5,17 @@ C++ library to read / write [DermAnnotation](https://kondoa9.github.io/DermAnnot
 This requires C++17 or later.
 
 ## Setup
+
 ```powershell
 # Windows
 .\scripts\windows\setup.ps1 # Run as admin
 ```
+
 ```zsh
 # macOS
 sudo zsh scripts/macos/setup.sh
 ```
+
 ```bash
 # Linux
 sudo bash scripts/linux/setup.sh
@@ -21,7 +24,6 @@ sudo bash scripts/linux/setup.sh
 ## Build
 
 ```sh
-bash scripts/setup_macos.sh         # If you are using macOS
 mkdir build/
 cd build/
 cmake ..                            # Configure
