@@ -13,12 +13,12 @@ This requires C++17 or later.
 
 ```zsh
 # macOS
-sudo zsh scripts/macos/setup.sh
+zsh scripts/macos/setup.sh
 ```
 
 ```bash
 # Linux
-sudo bash scripts/linux/setup.sh
+bash scripts/linux/setup.sh
 ```
 
 ## Build
