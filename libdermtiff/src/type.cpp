@@ -53,8 +53,5 @@ namespace ldt {
         layerCount(pageCount - 1),
         width(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH)),
         height(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH)),
-        photoMetric(util::GetField<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC)),
-        samplesPerPixel(util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL)),
-        scanlineSize(_internal::SafeTIFFGetValue<int64_t>(tiff, TIFFScanlineSize)),
         isValid(_internal::Validate(*this, tiff)) {}
 }
