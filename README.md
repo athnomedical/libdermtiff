@@ -6,6 +6,10 @@ This requires C++17 or later.
 
 ## Setup
 
+```
+git submodule update
+```
+
 ```powershell
 # Windows
 .\scripts\windows\setup.ps1 # Run as admin
