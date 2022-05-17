@@ -48,7 +48,7 @@ jobs:
           submodules: recursive
 
       - name: Setup
-        run: sudo zsh scripts/macos/setup.sh
+        run: zsh scripts/macos/setup.sh
 
       - name: Install Ninja
         run: brew install ninja
@@ -78,7 +78,7 @@ jobs:
           submodules: recursive
 
       - name: Setup
-        run: sudo bash scripts/linux/setup.sh
+        run: bash scripts/linux/setup.sh
 
       - name: Install Ninja
         run: sudo apt install ninja-build

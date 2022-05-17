@@ -3,9 +3,12 @@ running_path=`pwd`
 script_path=$(cd $(dirname $0); pwd)
 repo_path=`readlink -f ${script_path}/../../`
 
+# Update submodules
+git submodule update --init
+
 # Workaround for compiling error of libtiff
 script_path=$(cd $(dirname $0); pwd)
-mv ${script_path}/../deps/libtiff/VERSION ${script_path}/../deps/libtiff/VERSION.txt
+mv ${repo_path}/deps/libtiff/VERSION ${repo_path}/deps/libtiff/VERSION.txt
 
 # Build and install library.
 install_library() {
@@ -15,7 +18,7 @@ install_library() {
     cd build/
     cmake ..
     cmake --build . --config Release
-    cmake --install .
+    sudo cmake --install .
 
     # Copy shared object to bin/
     mkdir -p ${repo_path}/bin/
@@ -23,7 +26,7 @@ install_library() {
 
     # Clean library repo
     cd ../
-    git restore *
+    git restore .
     git clean -f -d
 }
 

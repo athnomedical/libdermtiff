@@ -11,7 +11,7 @@ install_library() {
     cd build/
     cmake ..
     cmake --build . --config Release
-    cmake --install .
+    sudo cmake --install .
 
     # Copy shared object to bin/
     mkdir -p ${repo_path}/bin/
@@ -19,7 +19,7 @@ install_library() {
 
     # Clean library repo
     cd ../
-    git restore *
+    git restore .
     git clean -f -d
 }
 

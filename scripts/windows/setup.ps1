@@ -17,7 +17,7 @@ function InstallLibrary ($library) {
 
     # Clean library repo
     Set-Location ..\
-    git restore *
+    git restore .
     git clean -f -d
 }
 
