@@ -1,7 +1,7 @@
 #!/bin/zsh
 running_path=`pwd`
 script_path=$(cd $(dirname $0); pwd)
-repo_path=`readlink -f ${script_path}/../../`
+repo_path="${script_path}/../../"
 
 # Workaround for compiling error of libtiff
 script_path=$(cd $(dirname $0); pwd)
