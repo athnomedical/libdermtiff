@@ -3,7 +3,8 @@ running_path=`pwd`
 script_path=$(cd $(dirname $0); pwd)
 repo_path=`readlink -f ${script_path}/../../`
 
-build() {
+# Build and install library.
+install_library() {
     echo -e "\e[32mBuild and install $1\e[m"
     cd ${repo_path}/deps/$1
     mkdir -p build/
@@ -11,9 +12,13 @@ build() {
     cmake ..
     cmake --build . --config Release
     cmake --install .
+
+    # Copy shared object to bin/
+    mkdir -p ${repo_path}/bin/
+    cp ${repo_path}/deps/$1/build/$2*.so ${repo_path}/bin/
 }
 
 # Build and install ZLIB
-build "zlib"
+install_library "zlib" "libz"
 
 cd $running_path
