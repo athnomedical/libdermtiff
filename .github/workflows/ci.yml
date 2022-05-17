@@ -25,7 +25,7 @@ jobs:
 
       - name: Configure
         run: |
-          mkdir build
+          mkdir build -Force
           cd build
           cmake ..
 
@@ -48,14 +48,14 @@ jobs:
           submodules: recursive
 
       - name: Setup
-        run: zsh scripts/macos/setup.sh
+        run: sudo zsh scripts/macos/setup.sh
 
       - name: Install Ninja
         run: brew install ninja
 
       - name: Configure
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake -GNinja ..
 
@@ -78,14 +78,14 @@ jobs:
           submodules: recursive
 
       - name: Setup
-        run: bash scripts/linux/setup.sh
+        run: sudo bash scripts/linux/setup.sh
 
       - name: Install Ninja
         run: sudo apt install ninja-build
 
       - name: Configure
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake -GNinja ..
 
