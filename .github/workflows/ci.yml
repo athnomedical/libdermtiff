@@ -17,6 +17,8 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recuesive
 
       - name: Setup
         run: .\scripts\windows\setup.ps1
@@ -42,6 +44,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recuesive
 
       - name: Setup
         run: zsh scripts/macos/setup.sh
@@ -70,6 +74,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recuesive
 
       - name: Setup
         run: bash scripts/linux/setup.sh
