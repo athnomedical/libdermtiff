@@ -29,10 +29,19 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
     std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "Test DermAnnotation TIFF images: " << path << std::endl;
     if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
-        std::vector<ldt::Pencil> tiffPencils(dermTiff.pages);
-        for (uint16_t page = 0; page < dermTiff.pages; page++) {
-            Image raster(dermTiff.width * dermTiff.height);
-            if (!ldt::ReadPage(path, page, reinterpret_cast<uint32_t*>(raster.data()), &tiffPencils[page])) {
+        Image raster(dermTiff.width * dermTiff.height);
+        // Read original image
+        {
+            if (!ldt::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
+                return false;
+            }
+        }
+
+        // Read layers
+        std::vector<ldt::Pencil> tiffPencils(dermTiff.pages - 1);
+        for (uint16_t layerIndex = 0; layerIndex < dermTiff.pages - 1; layerIndex++) {
+            if (!ldt::ReadLayer(
+                    path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &tiffPencils[layerIndex])) {
                 return false;
             }
         }
