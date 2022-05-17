@@ -31,7 +31,8 @@ namespace ldt {
                 } else if (count == 2) {
                     pencil.b = val;
                 } else if (count == 3) {
-                    pencil.a = val;
+                    // Pencil alpha rate must be 255
+                    pencil.a = 255;
                 }
                 count++;
             }
