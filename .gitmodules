@@ -1,3 +1,6 @@
 [submodule "deps/libtiff"]
 	path = deps/libtiff
 	url = https://gitlab.com/libtiff/libtiff.git
+[submodule "deps/zlib"]
+	path = deps/zlib
+	url = git@github.com:madler/zlib.git
