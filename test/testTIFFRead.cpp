@@ -47,8 +47,8 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
         }
 
         // validate pencils
-        for (size_t i = 1; i < tiffPencils.size(); i++) {
-            if (tiffPencils[i] != pencils[i - 1]) {
+        for (size_t i = 0; i < tiffPencils.size(); i++) {
+            if (tiffPencils[i] != pencils[i]) {
                 return false;
             }
         }
@@ -73,16 +73,17 @@ int main() {
     assert(testLibTiffImage("testfax4"));
 
     assert(testDermTiffImage("v0",
-                             {{"white", 255, 255, 255},
-                              {"red", 255, 0, 0},
-                              {"green", 0, 255, 0},
-                              {"blue", 0, 0, 255}}));  // Created by DermAnnotation v2.2.2 not libdermtiff.
+                             {{"white", 255, 255, 255, 255},
+                              {"red", 255, 0, 0, 255},
+                              {"green", 0, 255, 0, 255},
+                              {"blue", 0, 0, 255, 255}}));  // Created by DermAnnotation v2.2.2 not libdermtiff.
 
-    assert(testDermTiffImage("v1",
-                             {{"white", 255, 255, 255},
-                              {"red", 255, 0, 0},
-                              {"green", 0, 255, 0},
-                              {"blue", 0, 0, 255}}));  // Created with libdermtiff v0.1.0 built into DermAnnotation.
+    assert(
+        testDermTiffImage("v1",
+                          {{"white", 255, 255, 255, 255},
+                           {"red", 255, 0, 0, 255},
+                           {"green", 0, 255, 0, 255},
+                           {"blue", 0, 0, 255, 255}}));  // Created with libdermtiff v0.1.0 built into DermAnnotation.
 
     // The following tests depend on the build environment.
     // assert(!testLibTiffImage("deflate-last-strip-extra-data"));            // deflate compression is not supported
