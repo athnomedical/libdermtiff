@@ -71,6 +71,7 @@ int main() {
     assert(testLibTiffImage("rgb-3c-8b"));
     assert(testLibTiffImage("rgb-3c-16b"));
     assert(testLibTiffImage("testfax4"));
+    assert(testLibTiffImage("deflate-last-strip-extra-data"));  // Deflate compression support
 
     assert(testDermTiffImage("v0",
                              {{"white", 255, 255, 255, 255},
@@ -86,7 +87,6 @@ int main() {
                            {"blue", 0, 0, 255, 255}}));  // Created with libdermtiff v0.1.0 built into DermAnnotation.
 
     // The following tests depend on the build environment.
-    // assert(!testLibTiffImage("deflate-last-strip-extra-data"));            // deflate compression is not supported
     // assert(!testLibTiffImage("quad-tile.jpg"));                            // jpeg compression is not supported
     // assert(!testLibTiffImage("ojpeg_chewey_subsamp21_multi_strip"));       // old-jpeg compression is not supported
     // assert(!testLibTiffImage("ojpeg_single_strip_no_rowsperstrip"));       // old-jpeg compression is not supported
