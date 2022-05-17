@@ -22,7 +22,7 @@ install_library() {
     cp ${repo_path}/deps/$1/build/$2*.dylib ${repo_path}/bin/
 
     # Clean library repo
-    cd ..\
+    cd ../
     git restore *
     git clean -f -d
 }
