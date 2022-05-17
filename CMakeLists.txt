@@ -34,6 +34,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
 
+find_package(ZLIB REQUIRED)
+
 add_subdirectory("deps/libtiff")
 add_subdirectory("libdermtiff")
 add_subdirectory("test")
