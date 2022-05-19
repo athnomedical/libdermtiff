@@ -85,7 +85,7 @@ namespace ldt {
                    uint32_t height,
                    uint32_t* rasters[],
                    Pencil pencils[]) {
-        const auto pageCount = layerCount + 1;
+        const uint16_t pageCount = layerCount + 1;
 
         // check parameters
         if (width > DermTIFF::MaxWidth || height > DermTIFF::MaxHeight) {
