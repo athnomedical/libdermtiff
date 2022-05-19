@@ -75,4 +75,6 @@ bool success = ldt::WriteTIFF("image.tiff", pageCount, width, height, rasters.da
 
 ## Dependencies
 
+- [zlib](https://github.com/madler/zlib) v1.2.12  
+  Use to support deflate compression.
 - [libtiff](https://gitlab.com/libtiff/libtiff) v4.3.0
