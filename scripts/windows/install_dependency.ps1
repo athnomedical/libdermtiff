@@ -11,6 +11,10 @@ function InstallDependency ($library) {
     cmake --build . --config Release
     cmake --install .
 
+    # Copy shared object to bin/
+    mkdir ${REPO_PATH}bin -Force
+    Copy-Item ${REPO_PATH}deps\${library}\build\Release\${library}*.dll ${REPO_PATH}bin\
+
     # Clean library repo
     Set-Location ..\
     git restore .
