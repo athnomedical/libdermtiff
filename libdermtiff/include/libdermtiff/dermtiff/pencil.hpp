@@ -13,11 +13,11 @@ namespace ldt {
 
         std::optional<std::string> toString() const;
 
-        bool operator==(const Pencil& other) const {
+        bool operator==(const Pencil& other) const noexcept {
             return name == other.name && r == other.r && g == other.g && b == other.b;
         }
 
-        bool operator!=(const Pencil& other) const {
+        bool operator!=(const Pencil& other) const noexcept {
             return !(*this == other);
         }
     };

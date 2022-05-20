@@ -11,7 +11,7 @@ typedef struct tiff TIFF;
 namespace ldt {
     namespace util {
         template <typename T>
-        T GetField(TIFF* const tiff, uint32_t tag) {
+        T GetField(TIFF* const tiff, uint32_t tag) noexcept {
             if (tiff == nullptr) {
                 return T();
             } else {
@@ -22,7 +22,7 @@ namespace ldt {
         }
 
         template <typename T>
-        std::optional<T> GetFieldOpt(TIFF* const tiff, uint32_t tag) {
+        std::optional<T> GetFieldOpt(TIFF* const tiff, uint32_t tag) noexcept {
             if (tiff == nullptr) {
                 return std::nullopt;
             } else {
@@ -34,6 +34,6 @@ namespace ldt {
             }
         }
 
-        std::shared_ptr<TIFF> SafeTIFFOpen(const std::string& path, const char* mode);
+        std::shared_ptr<TIFF> SafeTIFFOpen(const std::string& path, const char* mode) noexcept;
     }
 }
