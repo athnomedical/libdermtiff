@@ -7,7 +7,7 @@
 namespace ldt {
     struct Pencil {
         std::string name = "";
-        uint8_t r = 0, g = 0, b = 0, a = 0;
+        uint8_t r = 0, g = 0, b = 0, a = 255;
 
         static std::optional<Pencil> Parse(const std::string& str);
 

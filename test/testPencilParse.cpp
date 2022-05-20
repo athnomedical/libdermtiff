@@ -1,61 +1,47 @@
 #include <assert.h>
 
+#include <sstream>
+
 #include "libdermtiff/dermtiff.hpp"
 
+bool testPencilStr(const std::string& str, const std::string& name, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    const auto result = ldt::Pencil::Parse(str);
+    const auto parsed = ldt::Pencil{name, r, g, b, a};
+    return result.has_value() && result.value() == parsed;
+}
+
+bool testPencil(const std::string& name, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    std::stringstream ss;
+    ss << name << "/(" << +r << "," << +g << "," << +b << "," << +a << ")";
+    return testPencilStr(ss.str(), name, r, g, b, a);
+}
+
 int main() {
-    {
-        const auto result = ldt::Pencil::Parse("pencil/(255,255,255,255)");
-        assert(result.has_value());
+    assert(testPencil("pencil", 255, 255, 255, 255));
 
-        const ldt::Pencil pencil = result.value();
-        assert(pencil.name == "pencil");
-        assert(pencil.r == 255);
-        assert(pencil.g == 255);
-        assert(pencil.b == 255);
-        assert(pencil.a == 255);
-    }
+    assert(testPencil("pencil", 0, 10, 100, 255));
 
-    {
-        const auto result = ldt::Pencil::Parse("pencil/(0,10,100,255)");
-        assert(result.has_value());
+    assert(testPencilStr("pencil/( 0 , 0 , 0 , 0 )", "pencil", 0, 0, 0, 0));
 
-        const ldt::Pencil pencil = result.value();
-        assert(pencil.name == "pencil");
-        assert(pencil.r == 0);
-        assert(pencil.g == 10);
-        assert(pencil.b == 100);
-        assert(pencil.a == 255);
-    }
+    assert(testPencilStr("pencil/ (0,0,0,0) ", "pencil", 0, 0, 0, 0));
 
-    {
-        const auto result = ldt::Pencil::Parse("");
-        assert(!result.has_value());
-    }
+    assert(testPencilStr(" pencil /(0,0,0,0)", "pencil", 0, 0, 0, 0));
 
-    {
-        const auto result = ldt::Pencil::Parse("/");
-        assert(!result.has_value());
-    }
+    assert(!ldt::Pencil::Parse("").has_value());
 
-    {
-        const auto result = ldt::Pencil::Parse("/()");
-        assert(!result.has_value());
-    }
+    assert(!ldt::Pencil::Parse("/").has_value());
 
-    {
-        const auto result = ldt::Pencil::Parse("/(,,,)");
-        assert(!result.has_value());
-    }
+    assert(!ldt::Pencil::Parse("/()").has_value());
 
-    {
-        const auto result = ldt::Pencil::Parse("//(0,0,0,0)");
-        assert(!result.has_value());
-    }
+    assert(!ldt::Pencil::Parse("/(,,,)").has_value());
 
-    {
-        const auto result = ldt::Pencil::Parse("pencil/(0,0,0)");
-        assert(!result.has_value());
-    }
+    assert(!ldt::Pencil::Parse("//(0,0,0,0)").has_value());
+
+    assert(!ldt::Pencil::Parse("pencil/()").has_value());
+
+    assert(!ldt::Pencil::Parse("pencil//(0,0,0,0)").has_value());
+
+    assert(!ldt::Pencil::Parse("pencil/(0,0,0)").has_value());
 
     return 0;
 }

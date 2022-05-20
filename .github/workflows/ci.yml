@@ -20,12 +20,12 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Update submodule
-        run: git submodule update --init --recursive
+      - name: Setup
+        run: .\scripts\windows\setup.ps1
 
       - name: Configure
         run: |
-          mkdir build
+          mkdir build -Force
           cd build
           cmake ..
 
@@ -47,18 +47,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Update submodule
-        run: git submodule update --init --recursive
-
       - name: Setup
-        run: bash scripts/setup_macos.sh
+        run: zsh scripts/macos/setup.sh
 
       - name: Install Ninja
         run: brew install ninja
 
       - name: Configure
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake -GNinja ..
 
@@ -80,15 +77,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Update submodule
-        run: git submodule update --init --recursive
+      - name: Setup
+        run: bash scripts/linux/setup.sh
 
       - name: Install Ninja
         run: sudo apt install ninja-build
 
       - name: Configure
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake -GNinja ..
 

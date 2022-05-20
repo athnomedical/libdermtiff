@@ -4,10 +4,30 @@ C++ library to read / write [DermAnnotation](https://kondoa9.github.io/DermAnnot
 
 This requires C++17 or later.
 
+## Setup
+
+```
+git submodule update
+```
+
+```powershell
+# Windows
+.\scripts\windows\setup.ps1 # Run as admin
+```
+
+```zsh
+# macOS
+zsh scripts/macos/setup.sh
+```
+
+```bash
+# Linux
+bash scripts/linux/setup.sh
+```
+
 ## Build
 
 ```sh
-bash scripts/setup_macos.sh         # If you are using macOS
 mkdir build/
 cd build/
 cmake ..                            # Configure
@@ -25,10 +45,19 @@ libdermtiff is in the namespace `ldt`.
 // Read TIFF file
 const std::string path = "image.tiff";
 if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
-    for (uint16_t page = 0; page < dermTiff.pages; page++) {
+    // Read original image
+    std::vector<uint32_t> raster(dermTiff.width * dermTiff.height);
+    if (ldt::ReadOriginalImage(path, raster.data()) {
+        // Success
+    } else {
+        // Failure
+    }
+
+    // Read layers
+    for (uint16_t layerIndex = 0; layerIndex < dermTiff.layerCount; layerIndex++) {
         std::vector<uint32_t> raster(dermTiff.width * dermTiff.height);
         ldt::Pencil pencil;
-        if (ldt::ReadPage(path, page, raster.data(), &pencil)) {
+        if (ldt::ReadLayer(path, layerIndex, raster.data(), &pencil)) {
             // Success
         } else {
             // Failure
@@ -55,4 +84,6 @@ bool success = ldt::WriteTIFF("image.tiff", pageCount, width, height, rasters.da
 
 ## Dependencies
 
+- [zlib](https://github.com/madler/zlib) v1.2.12  
+  Use to support deflate compression.
 - [libtiff](https://gitlab.com/libtiff/libtiff) v4.3.0

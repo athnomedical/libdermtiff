@@ -40,9 +40,7 @@ namespace ldt {
 
     bool ReadPage(
         const std::string& filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        const auto tiffPtr = util::SafeTIFFOpen(filepath, "r");
-
-        if (tiffPtr) {
+        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
             TIFF* const tiff    = tiffPtr.get();
             const auto dermTiff = DermTIFF(tiff);
 
@@ -57,10 +55,12 @@ namespace ldt {
                 return false;
             }
 
-            // Read pencil
-            if (const auto pagename = util::GetFieldOpt<char*>(tiff, TIFFTAG_PAGENAME); pagename.has_value()) {
-                if (const auto result = Pencil::Parse(pagename.value()); result.has_value()) {
-                    *pencil = result.value();
+            if (pencil != nullptr) {
+                // Read pencil
+                if (const auto pagename = util::GetFieldOpt<char*>(tiff, TIFFTAG_PAGENAME); pagename.has_value()) {
+                    if (const auto result = Pencil::Parse(pagename.value()); result.has_value()) {
+                        *pencil = result.value();
+                    }
                 }
             }
 
@@ -70,19 +70,30 @@ namespace ldt {
         return false;
     }
 
+    bool ReadOriginalImage(const std::string& filepath, uint32_t* raster, Orientation orientation) {
+        return ReadPage(filepath, 0, &*raster, nullptr, orientation);
+    }
+
+    bool ReadLayer(
+        const std::string& filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        return ReadPage(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
+    }
+
     bool WriteTIFF(const std::string& filepath,
-                   uint16_t pageCount,
+                   uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,
-                   uint32_t* raster[],
-                   Pencil pencil[]) {
+                   uint32_t* rasters[],
+                   Pencil pencils[]) {
+        const uint16_t pageCount = layerCount + 1;
+
         // check parameters
         if (width > DermTIFF::MaxWidth || height > DermTIFF::MaxHeight) {
             return false;
         }
-        for (uint16_t i = 0; i < pageCount; i++) {
+        for (uint16_t i = 0; i < layerCount; i++) {
             // layer has pencil with empty name
-            if (i != 0 && !pencil[i].toString().has_value()) {
+            if (!pencils[i].toString().has_value()) {
                 return false;
             }
         }
@@ -101,7 +112,7 @@ namespace ldt {
                 }
                 // layers
                 else {
-                    const auto penStr = pencil[page].toString();
+                    const auto penStr = pencils[page - 1].toString();
                     if (!penStr.has_value()
                         || !_internal::writer::TIFFSetDefaultFields(tiff, width, height, page, pageCount)
                         || TIFFSetField(tiff, TIFFTAG_PAGENAME, penStr.value().c_str()) != 1) {
@@ -109,7 +120,7 @@ namespace ldt {
                     }
                 }
 
-                _internal::writer::WriteImage(tiff, width, height, &*(raster[page]));
+                _internal::writer::WriteImage(tiff, width, height, &*(rasters[page]));
 
                 TIFFWriteDirectory(tiff);
             }
