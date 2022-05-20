@@ -43,10 +43,12 @@ bool read(const std::string& path, const std::vector<ldt::Pencil>& pencils = std
         Image raster(dermTiff.width * dermTiff.height);
         // read layers
         if (!pencils.empty()) {
-            for (size_t i = 0; i < pencils.size(); i++) {
-                if (ldt::Pencil pencil; ldt::ReadLayer(path, i, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
+            const uint16_t layerCount = static_cast<uint16_t>(pencils.size());
+            for (uint16_t layerIndex = 0; layerIndex < layerCount; layerIndex++) {
+                if (ldt::Pencil pencil;
+                    ldt::ReadLayer(path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
                     // compare pencil
-                    return pencil == pencils[i];
+                    return pencil == pencils[layerIndex];
                 } else {
                     return false;
                 }
