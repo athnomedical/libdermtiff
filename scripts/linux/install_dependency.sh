@@ -9,7 +9,7 @@ install_dependency() {
     cd ${repo_path}/deps/$1
     mkdir -p build/
     cd build/
-    cmake -DBUILD_SHARED_LIBS=ON ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON ..
     cmake --build . --config Release
     sudo cmake --install .
 

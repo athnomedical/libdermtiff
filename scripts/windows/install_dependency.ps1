@@ -7,7 +7,7 @@ function InstallDependency ($library) {
     Set-Location ${REPO_PATH}deps\${library}
     mkdir build -Force
     Set-Location .\build\
-    cmake -DBUILD_SHARED_LIBS=ON ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON ..
     cmake --build . --config Release
     cmake --install .
 
