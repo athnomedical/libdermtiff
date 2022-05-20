@@ -8,6 +8,6 @@ script_path=$(cd $(dirname $0); pwd)
 mv ${repo_path}/deps/libtiff/VERSION ${repo_path}/deps/libtiff/VERSION.txt
 
 # Build dependencies
-zsh ${script_path}/build_library.sh
+zsh ${script_path}/install_dependency.sh
 
 cd $running_path
