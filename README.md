@@ -45,10 +45,19 @@ libdermtiff is in the namespace `ldt`.
 // Read TIFF file
 const std::string path = "image.tiff";
 if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
-    for (uint16_t page = 0; page < dermTiff.pages; page++) {
+    // Read original image
+    std::vector<uint32_t> raster(dermTiff.width * dermTiff.height);
+    if (ldt::ReadOriginalImage(path, raster.data()) {
+        // Success
+    } else {
+        // Failure
+    }
+
+    // Read layers
+    for (uint16_t layerIndex = 0; layerIndex < dermTiff.layerCount; layerIndex++) {
         std::vector<uint32_t> raster(dermTiff.width * dermTiff.height);
         ldt::Pencil pencil;
-        if (ldt::ReadPage(path, page, raster.data(), &pencil)) {
+        if (ldt::ReadLayer(path, layerIndex, raster.data(), &pencil)) {
             // Success
         } else {
             // Failure
