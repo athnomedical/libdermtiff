@@ -20,7 +20,7 @@ namespace ldt::io {
     };
 
     // Try to open tiff file
-    DermTIFF Open(const std::string& filepath);
+    DermTIFF OpenTIFF(const std::string& filepath);
 
     // Read the specific page
     // - Page 0		: Original image

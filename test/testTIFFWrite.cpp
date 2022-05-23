@@ -41,7 +41,7 @@ bool writeWithPencils(
 }
 
 bool read(const std::string& path, const std::vector<ldt::Pencil>& pencils = std::vector<ldt::Pencil>()) {
-    if (const auto dermTiff = ldt::io::Open(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
         Image raster(dermTiff.width * dermTiff.height);
         // read layers
         if (!pencils.empty()) {

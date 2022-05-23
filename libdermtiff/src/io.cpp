@@ -34,7 +34,7 @@ namespace ldt::io {
         }
     }
 
-    DermTIFF Open(const std::string& filepath) {
+    DermTIFF OpenTIFF(const std::string& filepath) {
         return DermTIFF(filepath);
     }
 

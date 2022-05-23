@@ -16,7 +16,7 @@ bool testLibTiffImage(const std::string& filename) {
     const auto path = "../deps/libtiff/test/images/" + filename + ".tiff";
     std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "Test libtiff images: " << path << std::endl;
-    if (const auto dermTiff = ldt::io::Open(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
         Image raster(dermTiff.width * dermTiff.height);
         ldt::Pencil pencil;
         return ldt::io::ReadPage(path, 0, reinterpret_cast<uint32_t*>(raster.data()), &pencil);
@@ -28,7 +28,7 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
     const auto path = "../test/images/" + filename + ".tiff";
     std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "Test DermAnnotation TIFF images: " << path << std::endl;
-    if (const auto dermTiff = ldt::io::Open(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
         Image raster(dermTiff.width * dermTiff.height);
         // Read original image
         {
