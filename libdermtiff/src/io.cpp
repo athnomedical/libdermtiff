@@ -6,7 +6,7 @@
 
 #include "util.hpp"
 
-namespace ldt {
+namespace ldt::io {
     namespace _internal {
         namespace writer {
             bool TIFFSetDefaultFields(

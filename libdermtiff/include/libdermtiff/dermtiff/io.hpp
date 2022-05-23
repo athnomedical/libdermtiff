@@ -7,7 +7,7 @@
 #include "pencil.hpp"
 #include "type.hpp"
 
-namespace ldt {
+namespace ldt::io {
     enum class Orientation {
         TOPLEFT = 1,
         TOPRIGHT,

@@ -16,10 +16,10 @@ bool testLibTiffImage(const std::string& filename) {
     const auto path = "../deps/libtiff/test/images/" + filename + ".tiff";
     std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "Test libtiff images: " << path << std::endl;
-    if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::Open(path); dermTiff.isValid) {
         Image raster(dermTiff.width * dermTiff.height);
         ldt::Pencil pencil;
-        return ldt::ReadPage(path, 0, reinterpret_cast<uint32_t*>(raster.data()), &pencil);
+        return ldt::io::ReadPage(path, 0, reinterpret_cast<uint32_t*>(raster.data()), &pencil);
     }
     return false;
 }
@@ -28,11 +28,11 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
     const auto path = "../test/images/" + filename + ".tiff";
     std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "Test DermAnnotation TIFF images: " << path << std::endl;
-    if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::Open(path); dermTiff.isValid) {
         Image raster(dermTiff.width * dermTiff.height);
         // Read original image
         {
-            if (!ldt::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
+            if (!ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
                 return false;
             }
         }
@@ -40,7 +40,7 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
         // Read layers
         std::vector<ldt::Pencil> tiffPencils(dermTiff.layerCount);
         for (uint16_t layerIndex = 0; layerIndex < dermTiff.layerCount; layerIndex++) {
-            if (!ldt::ReadLayer(
+            if (!ldt::io::ReadLayer(
                     path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &tiffPencils[layerIndex])) {
                 return false;
             }

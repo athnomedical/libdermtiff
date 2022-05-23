@@ -17,7 +17,8 @@ bool write(const std::string& path, uint32_t width, uint32_t height, Image& imag
     std::vector<uint32_t*> rasters(1);
     rasters[0] = reinterpret_cast<uint32_t*>(image.data());
     std::vector<ldt::Pencil> pencils;
-    return ldt::WriteTIFF(path, pencils.size(), width, height, rasters.data(), pencils.data());
+    return ldt::io::WriteTIFF(
+        path, static_cast<uint16_t>(pencils.size()), width, height, rasters.data(), pencils.data());
 }
 
 bool writeWithPencils(
@@ -35,18 +36,19 @@ bool writeWithPencils(
     for (size_t i = 1; i < rasters.size(); i++) {
         rasters[i] = reinterpret_cast<uint32_t*>(layer.data());
     }
-    return ldt::WriteTIFF(path, pencils.size(), width, height, rasters.data(), pencils.data());
+    return ldt::io::WriteTIFF(
+        path, static_cast<uint16_t>(pencils.size()), width, height, rasters.data(), pencils.data());
 }
 
 bool read(const std::string& path, const std::vector<ldt::Pencil>& pencils = std::vector<ldt::Pencil>()) {
-    if (const auto dermTiff = ldt::Open(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::Open(path); dermTiff.isValid) {
         Image raster(dermTiff.width * dermTiff.height);
         // read layers
         if (!pencils.empty()) {
             const uint16_t layerCount = static_cast<uint16_t>(pencils.size());
             for (uint16_t layerIndex = 0; layerIndex < layerCount; layerIndex++) {
                 if (ldt::Pencil pencil;
-                    ldt::ReadLayer(path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
+                    ldt::io::ReadLayer(path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
                     // compare pencil
                     return pencil == pencils[layerIndex];
                 } else {
@@ -56,7 +58,7 @@ bool read(const std::string& path, const std::vector<ldt::Pencil>& pencils = std
         }
         // read original image
         else {
-            return ldt::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()));
+            return ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()));
         }
     }
     return false;
