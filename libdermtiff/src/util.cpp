@@ -2,6 +2,8 @@
 
 #include <libtiff/tiffio.h>
 
+#include "message_detail.hpp"
+
 namespace ldt::util {
     namespace _internal {
         void SafeTIFFClose(TIFF* const tiff) noexcept {
@@ -34,6 +36,10 @@ namespace ldt::util {
     }
 
     std::shared_ptr<TIFF> SafeTIFFOpen(const std::string& path, const char* mode) noexcept {
-        return std::shared_ptr<TIFF>(TIFFOpen(path.c_str(), mode), _internal::SafeTIFFClose);
+        TIFF* const tiff = TIFFOpen(path.c_str(), mode);
+        if (tiff == nullptr) {
+            msg::Output(msg::Type::Error, "util::SafeTIFFOpen", "Could not open the tiff");
+        }
+        return std::shared_ptr<TIFF>(tiff, _internal::SafeTIFFClose);
     }
 }
