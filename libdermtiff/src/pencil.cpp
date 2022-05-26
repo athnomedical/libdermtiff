@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "message_detail.hpp"
+
 namespace ldt {
     namespace _internal {
         void ltrim(std::string& str, const std::string& trimChars) {
@@ -28,17 +30,20 @@ namespace ldt {
             _internal::trim(str, " 　");  // Half-width space and full-width space
         }
     }
+
     std::optional<Pencil> Pencil::Parse(const std::string& str) {
         Pencil pencil;
 
         const auto index = str.find('/');
         if (index == std::string::npos) {
+            msg::Output(msg::Type::Error, "Pencil::Parse", "No separator in string");
             return std::nullopt;
         }
 
         pencil.name = str.substr(0, index);
         _internal::trimSpaces(pencil.name);
         if (pencil.name.empty()) {
+            msg::Output(msg::Type::Error, "Pencil::Parse", "Empty pencil name");
             return std::nullopt;
         }
 
@@ -65,18 +70,20 @@ namespace ldt {
             }
 
             if (count != 4) {
+                msg::Output(msg::Type::Error, "Pencil::Parse", "Invalid pencil color");
                 return std::nullopt;
             }
 
             return pencil;
         } catch (const std::exception& e) {
-            std::cerr << "Exception while parsing pencil: " << e.what() << std::endl;
+            msg::Output(msg::Type::Error, "Pencil::Parse", std::string(e.what()));
             return std::nullopt;
         }
     }
 
     std::optional<std::string> Pencil::toString() const {
         if (name.empty()) {
+            msg::Output(msg::Type::Error, "Pencil::toString", "Empty pencil name");
             return std::nullopt;
         }
 

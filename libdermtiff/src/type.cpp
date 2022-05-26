@@ -3,8 +3,20 @@
 #include <libtiff/tiffio.h>
 
 #include <functional>
+#include <memory>
 
+#include "message_detail.hpp"
 #include "util.hpp"
+
+#define ValidateDetail(errorMessage, process)                                                                          \
+    {                                                                                                                  \
+        bool valid = true;                                                                                             \
+        process;                                                                                                       \
+        isValid &= valid;                                                                                              \
+        if (!valid) {                                                                                                  \
+            msg::Output(msg::Type::Error, "DermTIFF::Validate", errorMessage);                                         \
+        }                                                                                                              \
+    }
 
 namespace ldt {
     namespace _internal {
@@ -16,42 +28,71 @@ namespace ldt {
             bool isValid = true;
 
             // image size is the same on all pages
-            for (uint16_t i = 0; i < dermTiff.pageCount; i++) {
-                TIFFReadDirectory(tiff);
-                isValid &= dermTiff.width == util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
-                isValid &= dermTiff.height == util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
-            }
-            TIFFSetDirectory(tiff, 0);
+            ValidateDetail("Size of images should be the same", {
+                for (uint16_t i = 0; i < dermTiff.pageCount; i++) {
+                    TIFFReadDirectory(tiff);
+                    valid &= dermTiff.width == util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
+                    valid &= dermTiff.height == util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
+                }
+                TIFFSetDirectory(tiff, 0);
+            });
 
             // limitation of image width and height
-            isValid &= 0 < dermTiff.width && 0 < dermTiff.height;
-            isValid &= dermTiff.width <= DermTIFF::MaxWidth && dermTiff.height <= DermTIFF::MaxHeight;
+            ValidateDetail("Image size exceeds the limit", {
+                valid &= 0 < dermTiff.width && 0 < dermTiff.height;
+                valid &= dermTiff.width <= DermTIFF::MaxWidth && dermTiff.height <= DermTIFF::MaxHeight;
+            });
 
             // compression support
-            {
+            ValidateDetail("The compression is not supported", {
                 const auto compression = util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
-                isValid &= TIFFIsCODECConfigured(compression) == 1;
-            }
+                valid &= TIFFIsCODECConfigured(compression) == 1;
+            });
 
             return isValid;
         }
 
-        template <typename T>
-        T SafeTIFFGetValue(TIFF* const tiff, const std::function<T(TIFF*)>& func) {
+        uint16_t SafeTIFFGetValue(TIFF* const tiff, const std::function<uint16_t(TIFF*)>& func) {
             if (tiff == nullptr) {
-                return T();
+                return 0;
             } else {
                 return func(tiff);
             }
+        }
+
+        std::vector<uint16_t> GetExtraSamples(TIFF* const tiff) {
+            if (tiff == nullptr) {
+                return std::vector<uint16_t>();
+            }
+
+            uint16_t count    = 0;
+            auto extraSamples = std::make_shared<uint16_t>();
+
+            TIFFGetField(tiff, TIFFTAG_EXTRASAMPLES, &count, extraSamples.get());
+
+            std::vector<uint16_t> result(count);
+            for (size_t i = 0; i < count; i++) {
+                result[i] = extraSamples.get()[i];
+            }
+
+            return result;
         }
     }
 
     DermTIFF::DermTIFF(const std::string& path) : DermTIFF(util::SafeTIFFOpen(path, "r").get()) {}
 
     DermTIFF::DermTIFF(TIFF* const tiff) :
-        pageCount(_internal::SafeTIFFGetValue<uint16_t>(tiff, TIFFNumberOfDirectories)),
+        pageCount(_internal::SafeTIFFGetValue(tiff, TIFFNumberOfDirectories)),
         layerCount(pageCount - 1),
         width(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH)),
         height(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH)),
-        isValid(_internal::Validate(*this, tiff)) {}
+        isOpened(tiff != nullptr),
+        isValid(_internal::Validate(*this, tiff)),
+        detail({util::GetField<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE),
+                util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION),
+                _internal::GetExtraSamples(tiff),
+                util::GetField<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC),
+                util::GetField<uint16_t>(tiff, TIFFTAG_PLANARCONFIG),
+                util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL),
+                util::GetField<uint32_t>(tiff, TIFFTAG_SUBFILETYPE)}) {}
 }

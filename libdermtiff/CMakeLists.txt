@@ -17,6 +17,7 @@ add_library(dermtiff)
 
 target_sources(dermtiff PRIVATE
     "./src/io.cpp"
+    "./src/message.cpp"
     "./src/pencil.cpp"
     "./src/type.cpp"
     "./src/util.cpp"
