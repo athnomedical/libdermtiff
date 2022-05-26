@@ -8,6 +8,6 @@ endmacro()
 
 add_template_test(dermtiff-pencil-parse "pencilParse.cpp")
 add_template_test(dermtiff-pencil-tostring "pencilToString.cpp")
-add_template_test(dermtiff-tiff-read "tIFFRead.cpp")
-add_template_test(dermtiff-tiff-write "tIFFWrite.cpp")
+add_template_test(dermtiff-tiff-read "tiffRead.cpp")
+add_template_test(dermtiff-tiff-write "tiffWrite.cpp")
 add_template_test(dermtiff-message "message.cpp")
