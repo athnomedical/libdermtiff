@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 typedef struct tiff TIFF;
 
@@ -11,7 +12,7 @@ namespace ldt {
         struct Detail {
             uint16_t bitsPerSample;
             uint16_t compression;
-            uint16_t extraSamples;
+            std::vector<uint16_t> extraSamples;
             uint16_t photometric;
             uint16_t planarConfig;
             uint16_t samplesPerPixel;

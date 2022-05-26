@@ -3,6 +3,7 @@
 #include <libtiff/tiffio.h>
 
 #include <functional>
+#include <memory>
 
 #include "message_detail.hpp"
 #include "util.hpp"
@@ -58,6 +59,24 @@ namespace ldt {
                 return func(tiff);
             }
         }
+
+        std::vector<uint16_t> GetExtraSamples(TIFF* const tiff) {
+            if (tiff == nullptr) {
+                return std::vector<uint16_t>();
+            }
+
+            uint16_t count    = 0;
+            auto extraSamples = std::make_shared<uint16_t>();
+
+            TIFFGetField(tiff, TIFFTAG_EXTRASAMPLES, &count, extraSamples.get());
+
+            std::vector<uint16_t> result(count);
+            for (size_t i = 0; i < count; i++) {
+                result[i] = extraSamples.get()[i];
+            }
+
+            return result;
+        }
     }
 
     DermTIFF::DermTIFF(const std::string& path) : DermTIFF(util::SafeTIFFOpen(path, "r").get()) {}
@@ -71,7 +90,7 @@ namespace ldt {
         isValid(_internal::Validate(*this, tiff)),
         detail({util::GetField<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE),
                 util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION),
-                util::GetField<uint16_t>(tiff, TIFFTAG_EXTRASAMPLES),
+                _internal::GetExtraSamples(tiff),
                 util::GetField<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC),
                 util::GetField<uint16_t>(tiff, TIFFTAG_PLANARCONFIG),
                 util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL),
