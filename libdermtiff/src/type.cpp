@@ -67,5 +67,13 @@ namespace ldt {
         layerCount(pageCount - 1),
         width(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH)),
         height(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH)),
-        isValid(_internal::Validate(*this, tiff)) {}
+        isOpened(tiff != nullptr),
+        isValid(_internal::Validate(*this, tiff)),
+        detail({util::GetField<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE),
+                util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION),
+                util::GetField<uint16_t>(tiff, TIFFTAG_EXTRASAMPLES),
+                util::GetField<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC),
+                util::GetField<uint16_t>(tiff, TIFFTAG_PLANARCONFIG),
+                util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL),
+                util::GetField<uint32_t>(tiff, TIFFTAG_SUBFILETYPE)}) {}
 }
