@@ -22,8 +22,6 @@
 namespace ldt {
     namespace _internal {
         bool Validate(const DermTIFF& dermTiff, TIFF* const tiff) {
-            using ss = std::stringstream;
-
             if (tiff == nullptr || dermTiff.pageCount == 0) {
                 return false;
             }
@@ -41,16 +39,17 @@ namespace ldt {
             });
 
             // limitation of image width and height
-            ValidateDetail((ss() << "Image size " << dermTiff.width << "x" << dermTiff.height << " exceeds the limit "
-                                 << DermTIFF::MaxWidth << "x" << DermTIFF::MaxHeight)
-                               .str(),
-                           valid &= 0 < dermTiff.width && 0 < dermTiff.height;
-                           valid &= dermTiff.width <= DermTIFF::MaxWidth && dermTiff.height <= DermTIFF::MaxHeight;);
+            ValidateDetail(ss.str(), valid &= 0 < dermTiff.width && 0 < dermTiff.height;
+                           valid &= dermTiff.width <= DermTIFF::MaxWidth && dermTiff.height <= DermTIFF::MaxHeight;
+                           std::stringstream ss;
+                           ss << "Image size " << dermTiff.width << "x" << dermTiff.height << " exceeds the limit "
+                              << DermTIFF::MaxWidth << "x" << DermTIFF::MaxHeight;);
 
             // compression support
-            ValidateDetail((ss() << "The compression " << compression << " is not supported").str(),
-                           const auto compression = util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
-                           valid &= TIFFIsCODECConfigured(compression) == 1;);
+            ValidateDetail(ss.str(), const auto compression = util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
+                           valid &= TIFFIsCODECConfigured(compression) == 1;
+                           std::stringstream ss;
+                           ss << "The compression " << compression << " is not supported";);
 
             return isValid;
         }
