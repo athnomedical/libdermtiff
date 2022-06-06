@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <memory>
+#include <sstream>
 
 #include "message_detail.hpp"
 #include "util.hpp"
@@ -28,7 +29,7 @@ namespace ldt {
             bool isValid = true;
 
             // image size is the same on all pages
-            ValidateDetail("Size of images should be the same", {
+            ValidateDetail("All of image size of pages should be the same", {
                 for (uint16_t i = 0; i < dermTiff.pageCount; i++) {
                     TIFFReadDirectory(tiff);
                     valid &= dermTiff.width == util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
@@ -38,16 +39,17 @@ namespace ldt {
             });
 
             // limitation of image width and height
-            ValidateDetail("Image size exceeds the limit", {
-                valid &= 0 < dermTiff.width && 0 < dermTiff.height;
-                valid &= dermTiff.width <= DermTIFF::MaxWidth && dermTiff.height <= DermTIFF::MaxHeight;
-            });
+            ValidateDetail(ss.str(), valid &= 0 < dermTiff.width && 0 < dermTiff.height;
+                           valid &= dermTiff.width <= DermTIFF::MaxWidth && dermTiff.height <= DermTIFF::MaxHeight;
+                           std::stringstream ss;
+                           ss << "Image size " << dermTiff.width << "x" << dermTiff.height << " exceeds the limit "
+                              << DermTIFF::MaxWidth << "x" << DermTIFF::MaxHeight;);
 
             // compression support
-            ValidateDetail("The compression is not supported", {
-                const auto compression = util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
-                valid &= TIFFIsCODECConfigured(compression) == 1;
-            });
+            ValidateDetail(ss.str(), const auto compression = util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
+                           valid &= TIFFIsCODECConfigured(compression) == 1;
+                           std::stringstream ss;
+                           ss << "The compression " << compression << " is not supported";);
 
             return isValid;
         }
