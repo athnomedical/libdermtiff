@@ -60,22 +60,23 @@ namespace ldt {
             }
         }
 
-        std::vector<uint16_t> GetExtraSamples(TIFF* const tiff) {
+        uint16_t GetExtraSamples(TIFF* const tiff) {
             if (tiff == nullptr) {
-                return std::vector<uint16_t>();
+                return 0;
             }
 
             uint16_t count    = 0;
-            auto extraSamples = std::make_shared<uint16_t>();
+            auto extraSamples = std::make_unique<uint16_t*>();
 
-            TIFFGetField(tiff, TIFFTAG_EXTRASAMPLES, &count, extraSamples.get());
-
-            std::vector<uint16_t> result(count);
-            for (size_t i = 0; i < count; i++) {
-                result[i] = extraSamples.get()[i];
+            if (TIFFGetField(tiff, TIFFTAG_EXTRASAMPLES, &count, extraSamples.get()) == 1) {
+                uint16_t result = 0;
+                for (size_t i = 0; i < count; i++) {
+                    result += *extraSamples.get()[i] + 2;
+                }
+                return result;
+            } else {
+                return 0;
             }
-
-            return result;
         }
     }
 
