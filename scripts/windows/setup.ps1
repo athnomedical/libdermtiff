@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 $RUNNING_PATH = Get-Location
 
 # Build dependencies
