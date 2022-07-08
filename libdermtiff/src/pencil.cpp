@@ -31,6 +31,18 @@ namespace ldt {
         }
     }
 
+    Pencil::Pencil(std::string_view _name) {
+        setName(_name);
+    }
+
+    Pencil::Pencil(std::string_view _name, uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a) {
+        setName(_name);
+        r = _r;
+        g = _g;
+        b = _b;
+        a = _a;
+    }
+
     std::optional<Pencil> Pencil::Parse(const std::string& str) {
         Pencil pencil;
 
@@ -40,12 +52,14 @@ namespace ldt {
             return std::nullopt;
         }
 
-        pencil.name = str.substr(0, index);
-        _internal::trimSpaces(pencil.name);
-        if (pencil.name.empty()) {
+        std::string pencilName = str.substr(0, index);
+        _internal::trimSpaces(pencilName);
+        if (pencilName.empty()) {
             msg::Output(msg::Type::Error, "Pencil::Parse", "Empty pencil name");
             return std::nullopt;
         }
+
+        strcpy(pencil.name, pencilName.c_str());
 
         try {
             auto colorString = str.substr(index + 1, str.length() - index);
@@ -81,8 +95,22 @@ namespace ldt {
         }
     }
 
+    bool Pencil::setName(std::string_view _name) {
+        const bool isValidLength = _name.length() <= MaxNameLength;
+
+        if (isValidLength) {
+            strcpy(name, _name.data());
+        } else {
+            const auto str = std::string(_name.substr(0, MaxNameLength)) + '\0';
+            strcpy(name, str.data());
+            msg::Output(msg::Type::Warning, "Pencil::setName", "Name length exceeds the limit");
+        }
+
+        return isValidLength;
+    }
+
     std::optional<std::string> Pencil::toString() const {
-        if (name.empty()) {
+        if (std::string(name).empty()) {
             msg::Output(msg::Type::Error, "Pencil::toString", "Empty pencil name");
             return std::nullopt;
         }
