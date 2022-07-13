@@ -20,7 +20,7 @@ std::string TypeToStr(ldt::msg::Type type) {
     }
 }
 
-void callback(ldt::msg::Type type, const std::string &message) {
+void callback(ldt::msg::Type type, std::string_view message) {
     std::cout << "[" << TypeToStr(type) << "] " << message << std::endl;
     called = true;
 }

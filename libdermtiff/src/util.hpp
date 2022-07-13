@@ -28,6 +28,6 @@ namespace ldt {
             }
         }
 
-        std::shared_ptr<TIFF> SafeTIFFOpen(const std::string& path, const char* mode) noexcept;
+        std::shared_ptr<TIFF> SafeTIFFOpen(std::string_view path, const char* mode) noexcept;
     }
 }

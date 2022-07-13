@@ -18,7 +18,7 @@ namespace ldt {
 
         Pencil(std::string_view _name, uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255);
 
-        static std::optional<Pencil> Parse(const std::string& str);
+        static std::optional<Pencil> Parse(std::string_view str);
 
         bool setName(std::string_view _name);
 
