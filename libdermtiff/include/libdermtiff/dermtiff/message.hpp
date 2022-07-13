@@ -8,7 +8,7 @@ namespace ldt::msg {
 
     void SetStdErrWhenNoCallback(bool enable);
 
-    void RegisterCallback(const std::function<void(Type, const std::string&)>& callback);
+    void RegisterCallback(const std::function<void(Type, std::string_view)>& callback);
 
     void RemoveCallback();
 }

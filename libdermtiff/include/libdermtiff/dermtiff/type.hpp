@@ -36,7 +36,7 @@ namespace ldt {
         const bool isOpened, isValid;
         const Detail detail;
 
-        explicit DermTIFF(const std::string& path);
+        explicit DermTIFF(std::string_view path);
 
         explicit DermTIFF(TIFF* const tiff);
     };

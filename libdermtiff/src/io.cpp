@@ -46,12 +46,11 @@ namespace ldt::io {
         }
     }
 
-    DermTIFF OpenTIFF(const std::string& filepath) {
+    DermTIFF OpenTIFF(std::string_view filepath) {
         return DermTIFF(filepath);
     }
 
-    bool ReadPage(
-        const std::string& filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+    bool ReadPage(std::string_view filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
             TIFF* const tiff    = tiffPtr.get();
             const auto dermTiff = DermTIFF(tiff);
@@ -83,16 +82,16 @@ namespace ldt::io {
         return false;
     }
 
-    bool ReadOriginalImage(const std::string& filepath, uint32_t* raster, Orientation orientation) {
+    bool ReadOriginalImage(std::string_view filepath, uint32_t* raster, Orientation orientation) {
         return ReadPage(filepath, 0, &*raster, nullptr, orientation);
     }
 
     bool ReadLayer(
-        const std::string& filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        std::string_view filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         return ReadPage(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
     }
 
-    bool WriteTIFF(const std::string& filepath,
+    bool WriteTIFF(std::string_view filepath,
                    uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,

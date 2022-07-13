@@ -5,5 +5,5 @@
 #include "../include/libdermtiff/dermtiff/message.hpp"
 
 namespace ldt::msg {
-    void Output(Type type, const std::string& funcName, const std::string& message);
+    void Output(Type type, std::string_view funcName, std::string_view message);
 }
