@@ -42,7 +42,7 @@ bool writeWithPencils(
 
 bool read(const std::string& path, const std::vector<ldt::Pencil>& pencils = std::vector<ldt::Pencil>()) {
     if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
-        Image raster(dermTiff.width * dermTiff.height);
+        Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
         // read layers
         if (!pencils.empty()) {
             const uint16_t layerCount = static_cast<uint16_t>(pencils.size());
