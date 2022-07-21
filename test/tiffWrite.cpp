@@ -138,13 +138,5 @@ int main() {
         TestWriteRead(true, true, width, height, image);
     }
 
-    {
-        // Max size with 2 pencils
-        const uint32_t width = ldt::DermTIFF::MaxWidth, height = ldt::DermTIFF::MaxHeight;
-        Image image(width * height);
-        std::vector<ldt::Pencil> pencils = {{"pencil"}, {"pencil2"}};
-        TestWriteReadPencil(true, true, width, height, image, pencils);
-    }
-
     return 0;
 }
