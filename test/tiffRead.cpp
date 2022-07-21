@@ -1,4 +1,13 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#define CONF_RELEASE
+#endif
+
 #include <assert.h>
+#ifdef CONF_RELEASE
+#define NDEBUG
+#undef CONF_RELEASE
+#endif
 
 #include <iostream>
 #include <string>

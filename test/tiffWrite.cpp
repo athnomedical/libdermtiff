@@ -1,4 +1,13 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#define CONF_RELEASE
+#endif
+
 #include <assert.h>
+#ifdef CONF_RELEASE
+#define NDEBUG
+#undef CONF_RELEASE
+#endif
 
 #include <filesystem>
 #include <optional>
@@ -133,6 +142,14 @@ int main() {
         const uint32_t width = ldt::DermTIFF::MaxWidth, height = ldt::DermTIFF::MaxHeight;
         Image image(width * height);
         TestWriteRead(true, true, width, height, image);
+    }
+
+    {
+        // Max size with 2 pencils
+        const uint32_t width = ldt::DermTIFF::MaxWidth, height = ldt::DermTIFF::MaxHeight;
+        Image image(width * height);
+        std::vector<ldt::Pencil> pencils = {{"pencil"}, {"pencil2"}};
+        TestWriteReadPencil(true, true, width, height, image, pencils);
     }
 
     return 0;
