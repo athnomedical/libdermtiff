@@ -15,7 +15,7 @@ namespace ldt::io {
                 constexpr int16_t extraSamples[] = {EXTRASAMPLE_UNASSALPHA};
                 const auto result                = TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH, width) == 1
                                     && TIFFSetField(tiff, TIFFTAG_IMAGELENGTH, height) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_LZW) == 1
+                                    && TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_ADOBE_DEFLATE) == 1
                                     && TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB) == 1
                                     && TIFFSetField(tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG) == 1
                                     && TIFFSetField(tiff, TIFFTAG_SAMPLESPERPIXEL, 4) == 1
