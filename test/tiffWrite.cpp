@@ -1,13 +1,4 @@
-#ifdef NDEBUG
-#undef NDEBUG
-#define CONF_RELEASE
-#endif
-
 #include <assert.h>
-#ifdef CONF_RELEASE
-#define NDEBUG
-#undef CONF_RELEASE
-#endif
 
 #include <filesystem>
 #include <optional>
@@ -78,19 +69,22 @@ std::string getOutPath() {
     return "../test/out/out" + std::to_string(i++) + ".tiff";
 }
 
-#define TestWriteRead(writable, readable, width, height, image)                                                        \
-    {                                                                                                                  \
-        const auto file = getOutPath();                                                                                \
-        assert(write(file, width, height, image) == writable);                                                         \
-        assert(read(file) == readable);                                                                                \
-    }
+void TestWriteRead(bool writable, bool readable, uint32_t width, uint32_t height, Image& image) {
+    const auto file        = getOutPath();
+    const auto writeResult = write(file, width, height, image);
+    assert(writeResult == writable);
+    const auto readResult = read(file);
+    assert(readResult == readable);
+}
 
-#define TestWriteReadPencil(writable, readable, width, height, image, pencils)                                         \
-    {                                                                                                                  \
-        const auto file = getOutPath();                                                                                \
-        assert(writeWithPencils(file, width, height, image, pencils) == writable);                                     \
-        assert(read(file, pencils) == readable);                                                                       \
-    }
+void TestWriteReadPencil(
+    bool writable, bool readable, uint32_t width, uint32_t height, Image& image, std::vector<ldt::Pencil>& pencils) {
+    const auto file        = getOutPath();
+    const auto writeResult = writeWithPencils(file, width, height, image, pencils);
+    assert(writeResult == writable);
+    const auto readResult = read(file, pencils);
+    assert(readResult == readable);
+}
 
 int main() {
     // delete all tiff files exist

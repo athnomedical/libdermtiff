@@ -1,13 +1,4 @@
-#ifdef NDEBUG
-#undef NDEBUG
-#define CONF_RELEASE
-#endif
-
 #include <assert.h>
-#ifdef CONF_RELEASE
-#define NDEBUG
-#undef CONF_RELEASE
-#endif
 
 #include <iostream>
 #include <string>
@@ -66,40 +57,49 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
     return false;
 }
 
+void testLibTiffImageAssert(const std::string& filename) {
+    const auto result = testLibTiffImage(filename);
+    assert(result);
+}
+
+void testDermTiffImageAssert(const std::string& filename, const std::vector<ldt::Pencil>& pencils) {
+    const auto result = testDermTiffImage(filename, pencils);
+    assert(result);
+}
+
 int main() {
-    assert(testLibTiffImage("logluv-3c-16b"));
-    assert(testLibTiffImage("lzw-single-strip"));
-    assert(testLibTiffImage("minisblack-1c-8b"));
-    assert(testLibTiffImage("minisblack-1c-16b"));
-    assert(testLibTiffImage("minisblack-2c-8b-alpha"));
-    assert(testLibTiffImage("miniswhite-1c-1b"));
-    assert(testLibTiffImage("palette-1c-1b"));
-    assert(testLibTiffImage("palette-1c-4b"));
-    assert(testLibTiffImage("palette-1c-8b"));
-    assert(testLibTiffImage("quad-lzw-compat"));
-    assert(testLibTiffImage("rgb-3c-8b"));
-    assert(testLibTiffImage("rgb-3c-16b"));
-    assert(testLibTiffImage("testfax4"));
-    assert(testLibTiffImage("deflate-last-strip-extra-data"));  // Deflate compression support
+    testLibTiffImageAssert("logluv-3c-16b");
+    testLibTiffImageAssert("lzw-single-strip");
+    testLibTiffImageAssert("minisblack-1c-8b");
+    testLibTiffImageAssert("minisblack-1c-16b");
+    testLibTiffImageAssert("minisblack-2c-8b-alpha");
+    testLibTiffImageAssert("miniswhite-1c-1b");
+    testLibTiffImageAssert("palette-1c-1b");
+    testLibTiffImageAssert("palette-1c-4b");
+    testLibTiffImageAssert("palette-1c-8b");
+    testLibTiffImageAssert("quad-lzw-compat");
+    testLibTiffImageAssert("rgb-3c-8b");
+    testLibTiffImageAssert("rgb-3c-16b");
+    testLibTiffImageAssert("testfax4");
+    testLibTiffImageAssert("deflate-last-strip-extra-data");  // Deflate compression support
 
-    assert(testDermTiffImage("v0",
-                             {{"white", 255, 255, 255, 255},
-                              {"red", 255, 0, 0, 255},
-                              {"green", 0, 255, 0, 255},
-                              {"blue", 0, 0, 255, 255}}));  // Created by DermAnnotation v2.2.2 not libdermtiff.
+    testDermTiffImageAssert("v0",
+                            {{"white", 255, 255, 255, 255},
+                             {"red", 255, 0, 0, 255},
+                             {"green", 0, 255, 0, 255},
+                             {"blue", 0, 0, 255, 255}});  // Created by DermAnnotation v2.2.2 not libdermtiff.
 
-    assert(
-        testDermTiffImage("v1",
-                          {{"white", 255, 255, 255, 255},
-                           {"red", 255, 0, 0, 255},
-                           {"green", 0, 255, 0, 255},
-                           {"blue", 0, 0, 255, 255}}));  // Created with libdermtiff v0.1.0 built into DermAnnotation.
+    testDermTiffImageAssert("v1",
+                            {{"white", 255, 255, 255, 255},
+                             {"red", 255, 0, 0, 255},
+                             {"green", 0, 255, 0, 255},
+                             {"blue", 0, 0, 255, 255}});  // Created with libdermtiff v0.1.0 built into DermAnnotation.
 
     // The following tests depend on the build environment.
-    // assert(!testLibTiffImage("quad-tile.jpg"));                            // jpeg compression is not supported
-    // assert(!testLibTiffImage("ojpeg_chewey_subsamp21_multi_strip"));       // old-jpeg compression is not supported
-    // assert(!testLibTiffImage("ojpeg_single_strip_no_rowsperstrip"));       // old-jpeg compression is not supported
-    // assert(!testLibTiffImage("ojpeg_zackthecat_subsamp22_single_strip"));  // old-jpeg compression is not supported
+    // quad-tile.jpg                           : jpeg compression is not supported
+    // ojpeg_chewey_subsamp21_multi_strip      : old-jpeg compression is not supported
+    // ojpeg_single_strip_no_rowsperstrip      : old-jpeg compression is not supported
+    // ojpeg_zackthecat_subsamp22_single_strip : old-jpeg compression is not supported
 
     return 0;
 }
