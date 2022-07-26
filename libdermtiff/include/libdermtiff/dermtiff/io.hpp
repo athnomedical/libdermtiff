@@ -51,5 +51,5 @@ namespace ldt::io {
                    uint32_t width,
                    uint32_t height,
                    uint32_t** rasters,
-                   Pencil* pencils);
+                   const Pencil* const pencils);
 }
