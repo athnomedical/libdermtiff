@@ -32,7 +32,7 @@ namespace ldt::io {
                 return result;
             }
 
-            bool WriteImage(TIFF* const tiff, uint32_t width, uint32_t height, uint32_t* const raster) {
+            bool WriteImage(TIFF* const tiff, uint32_t width, uint32_t height, const uint32_t* const raster) {
                 for (uint32_t y = 0; y < height; y++) {
                     const auto pos = y * width;
                     // raster + pos is the pointer of the image[y][0]
@@ -97,7 +97,7 @@ namespace ldt::io {
                    uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,
-                   uint32_t* const* const rasters,
+                   const uint32_t* const* const rasters,
                    const Pencil* const pencils) {
         const uint16_t pageCount = layerCount + 1;
 
