@@ -36,9 +36,7 @@ namespace ldt::io {
                 for (uint32_t y = 0; y < height; y++) {
                     const auto pos = y * width;
                     // raster + pos is the pointer of the image[y][0]
-                    // Since libtiff interface does not support const, so use const_cast to remove const
-                    // Writing process only reads the value, there is no change
-                    if (TIFFWriteScanline(tiff, const_cast<uint32_t* const>(raster) + pos, y) != 1) {
+                    if (TIFFWriteScanline(tiff, raster + pos, y) != 1) {
                         msg::Output(msg::Type::Error, "io::WriteImage", "Could not write the image");
                         return false;
                     }
