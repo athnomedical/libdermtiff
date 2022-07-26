@@ -50,6 +50,6 @@ namespace ldt::io {
                    uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,
-                   uint32_t** rasters,
+                   uint32_t* const* const rasters,
                    const Pencil* const pencils);
 }

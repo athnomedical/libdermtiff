@@ -32,11 +32,13 @@ namespace ldt::io {
                 return result;
             }
 
-            bool WriteImage(TIFF* const tiff, uint32_t width, uint32_t height, uint32_t* raster) {
+            bool WriteImage(TIFF* const tiff, uint32_t width, uint32_t height, uint32_t* const raster) {
                 for (uint32_t y = 0; y < height; y++) {
                     const auto pos = y * width;
                     // raster + pos is the pointer of the image[y][0]
-                    if (TIFFWriteScanline(tiff, raster + pos, y) != 1) {
+                    // Since libtiff interface does not support const, so use const_cast to remove const
+                    // Writing process only reads the value, there is no change
+                    if (TIFFWriteScanline(tiff, const_cast<uint32_t* const>(raster) + pos, y) != 1) {
                         msg::Output(msg::Type::Error, "io::WriteImage", "Could not write the image");
                         return false;
                     }
@@ -95,7 +97,7 @@ namespace ldt::io {
                    uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,
-                   uint32_t** rasters,
+                   uint32_t* const* const rasters,
                    const Pencil* const pencils) {
         const uint16_t pageCount = layerCount + 1;
 
