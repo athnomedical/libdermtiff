@@ -13,13 +13,7 @@ struct Color {
 
 using Image = std::vector<Color>;
 
-bool WriteTIFF(std::string_view path, uint32_t width, uint32_t height) {
-    Image image(width * height);
-    std::vector<uint32_t*> rasters = {reinterpret_cast<uint32_t*>(image.data())};
-    return ldt::io::WriteTIFF(path, 0, width, height, rasters.data(), nullptr);
-}
-
-bool WriteTIFFWithPencils(std::string_view path, uint32_t width, uint32_t height, std::vector<ldt::Pencil>& pencils) {
+bool WriteTIFF(std::string_view path, uint32_t width, uint32_t height, const std::vector<ldt::Pencil>& pencils) {
     std::vector<Image> images(1 + pencils.size());
     std::vector<uint32_t*> rasters(1 + pencils.size());
 
@@ -40,7 +34,7 @@ bool WriteTIFFWithPencils(std::string_view path, uint32_t width, uint32_t height
         path, static_cast<uint16_t>(pencils.size()), width, height, rasters.data(), pencils.data());
 }
 
-bool ReadTIFF(std::string_view path, const std::vector<ldt::Pencil>& pencils = std::vector<ldt::Pencil>()) {
+bool ReadTIFF(std::string_view path, const std::vector<ldt::Pencil>& pencils) {
     if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
 
@@ -68,16 +62,11 @@ std::string GetOutPath() {
     return "../test/out/out" + std::to_string(i++) + ".tiff";
 }
 
-std::pair<bool, bool> WriteRead(uint32_t width, uint32_t height) {
+std::pair<bool, bool> WriteRead(uint32_t width,
+                                uint32_t height,
+                                const std::vector<ldt::Pencil>& pencils = std::vector<ldt::Pencil>()) {
     const auto file        = GetOutPath();
-    const auto writeResult = WriteTIFF(file, width, height);
-    const auto readResult  = ReadTIFF(file);
-    return {writeResult, readResult};
-}
-
-std::pair<bool, bool> WriteReadWithPencils(uint32_t width, uint32_t height, std::vector<ldt::Pencil>& pencils) {
-    const auto file        = GetOutPath();
-    const auto writeResult = WriteTIFFWithPencils(file, width, height, pencils);
+    const auto writeResult = WriteTIFF(file, width, height, pencils);
     const auto readResult  = ReadTIFF(file, pencils);
     return {writeResult, readResult};
 }
@@ -93,7 +82,7 @@ TEST_CASE("Write", "[io::WriteTIFF]") {
     SECTION("With two pencils") {
         std::vector<ldt::Pencil> pencils = {{"pencil"}, {"pencil2"}};
 
-        const auto [writeResult, readResult] = WriteReadWithPencils(255, 255, pencils);
+        const auto [writeResult, readResult] = WriteRead(255, 255, pencils);
 
         REQUIRE(writeResult);
         REQUIRE(readResult);
@@ -111,7 +100,7 @@ TEST_CASE("Not writable", "[io::WriteTIFF]") {
     SECTION("Invalid pencil") {
         std::vector<ldt::Pencil> pencils = {{""}};
 
-        const auto [writeResult, readResult] = WriteReadWithPencils(255, 255, pencils);
+        const auto [writeResult, readResult] = WriteRead(255, 255, pencils);
 
         REQUIRE_FALSE(writeResult);
         REQUIRE_FALSE(readResult);
