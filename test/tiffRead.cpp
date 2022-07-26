@@ -1,9 +1,10 @@
-#include <assert.h>
+#define CATCH_CONFIG_MAIN
 
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "catch2/catch.hpp"
 #include "libdermtiff/dermtiff.hpp"
 
 struct Color {
@@ -12,29 +13,35 @@ struct Color {
 
 using Image = std::vector<Color>;
 
-bool testLibTiffImage(const std::string& filename) {
+bool ReadLibtiffImage(const std::string& filename) {
     const auto path = "../deps/libtiff/test/images/" + filename + ".tiff";
     std::cout << "-------------------------------------------------" << std::endl;
-    std::cout << "Test libtiff images: " << path << std::endl;
+    std::cout << "Read libtiff image: " << path << std::endl;
+
     if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
-        Image raster(dermTiff.width * dermTiff.height);
+        Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
         ldt::Pencil pencil;
-        return ldt::io::ReadPage(path, 0, reinterpret_cast<uint32_t*>(raster.data()), &pencil);
+        for (uint16_t i = 0; i < dermTiff.layerCount + 1; i++) {
+            if (!ldt::io::ReadPage(path, i, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
+                return false;
+            }
+        }
+        return true;
     }
     return false;
 }
 
-bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Pencil>& pencils) {
+bool ReadDermTiffImage(const std::string& filename, const std::vector<ldt::Pencil>& pencils) {
     const auto path = "../test/images/" + filename + ".tiff";
     std::cout << "-------------------------------------------------" << std::endl;
-    std::cout << "Test DermAnnotation TIFF images: " << path << std::endl;
+    std::cout << "Read DermAnnotation TIFF image: " << path << std::endl;
+
     if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
-        Image raster(dermTiff.width * dermTiff.height);
+        Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
+
         // Read original image
-        {
-            if (!ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
-                return false;
-            }
+        if (!ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
+            return false;
         }
 
         // Read layers
@@ -57,40 +64,43 @@ bool testDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
     return false;
 }
 
-int main() {
-    assert(testLibTiffImage("logluv-3c-16b"));
-    assert(testLibTiffImage("lzw-single-strip"));
-    assert(testLibTiffImage("minisblack-1c-8b"));
-    assert(testLibTiffImage("minisblack-1c-16b"));
-    assert(testLibTiffImage("minisblack-2c-8b-alpha"));
-    assert(testLibTiffImage("miniswhite-1c-1b"));
-    assert(testLibTiffImage("palette-1c-1b"));
-    assert(testLibTiffImage("palette-1c-4b"));
-    assert(testLibTiffImage("palette-1c-8b"));
-    assert(testLibTiffImage("quad-lzw-compat"));
-    assert(testLibTiffImage("rgb-3c-8b"));
-    assert(testLibTiffImage("rgb-3c-16b"));
-    assert(testLibTiffImage("testfax4"));
-    assert(testLibTiffImage("deflate-last-strip-extra-data"));  // Deflate compression support
-
-    assert(testDermTiffImage("v0",
-                             {{"white", 255, 255, 255, 255},
-                              {"red", 255, 0, 0, 255},
-                              {"green", 0, 255, 0, 255},
-                              {"blue", 0, 0, 255, 255}}));  // Created by DermAnnotation v2.2.2 not libdermtiff.
-
-    assert(
-        testDermTiffImage("v1",
-                          {{"white", 255, 255, 255, 255},
-                           {"red", 255, 0, 0, 255},
-                           {"green", 0, 255, 0, 255},
-                           {"blue", 0, 0, 255, 255}}));  // Created with libdermtiff v0.1.0 built into DermAnnotation.
+TEST_CASE("Read test images in libtiff", "[io::Read]") {
+    REQUIRE(ReadLibtiffImage("logluv-3c-16b"));
+    REQUIRE(ReadLibtiffImage("lzw-single-strip"));
+    REQUIRE(ReadLibtiffImage("minisblack-1c-8b"));
+    REQUIRE(ReadLibtiffImage("minisblack-1c-16b"));
+    REQUIRE(ReadLibtiffImage("minisblack-2c-8b-alpha"));
+    REQUIRE(ReadLibtiffImage("miniswhite-1c-1b"));
+    REQUIRE(ReadLibtiffImage("palette-1c-1b"));
+    REQUIRE(ReadLibtiffImage("palette-1c-4b"));
+    REQUIRE(ReadLibtiffImage("palette-1c-8b"));
+    REQUIRE(ReadLibtiffImage("quad-lzw-compat"));
+    REQUIRE(ReadLibtiffImage("rgb-3c-8b"));
+    REQUIRE(ReadLibtiffImage("rgb-3c-16b"));
+    REQUIRE(ReadLibtiffImage("testfax4"));
+    REQUIRE(ReadLibtiffImage("deflate-last-strip-extra-data"));  // Deflate compression support
 
     // The following tests depend on the build environment.
-    // assert(!testLibTiffImage("quad-tile.jpg"));                            // jpeg compression is not supported
-    // assert(!testLibTiffImage("ojpeg_chewey_subsamp21_multi_strip"));       // old-jpeg compression is not supported
-    // assert(!testLibTiffImage("ojpeg_single_strip_no_rowsperstrip"));       // old-jpeg compression is not supported
-    // assert(!testLibTiffImage("ojpeg_zackthecat_subsamp22_single_strip"));  // old-jpeg compression is not supported
+    // quad-tile.jpg                           : jpeg compression is not supported
+    // ojpeg_chewey_subsamp21_multi_strip      : old-jpeg compression is not supported
+    // ojpeg_single_strip_no_rowsperstrip      : old-jpeg compression is not supported
+    // ojpeg_zackthecat_subsamp22_single_strip : old-jpeg compression is not supported
+}
 
-    return 0;
+TEST_CASE("Read tiff images created by DermAnnotation", "[io::Read]") {
+    REQUIRE(ReadDermTiffImage("v0",
+                              {
+                                  {"white", 255, 255, 255, 255},
+                                  {"red", 255, 0, 0, 255},
+                                  {"green", 0, 255, 0, 255},
+                                  {"blue", 0, 0, 255, 255},
+                              }));  // Created by DermAnnotation v2.2.2 not libdermtiff.
+
+    REQUIRE(ReadDermTiffImage("v1",
+                              {
+                                  {"white", 255, 255, 255, 255},
+                                  {"red", 255, 0, 0, 255},
+                                  {"green", 0, 255, 0, 255},
+                                  {"blue", 0, 0, 255, 255},
+                              }));  // Created with libdermtiff v0.1.0 built into DermAnnotation.
 }

@@ -35,8 +35,8 @@ namespace ldt::util {
         return _internal::GetFieldUInt<uint32_t>(tiff, tag);
     }
 
-    std::shared_ptr<TIFF> SafeTIFFOpen(const std::string& path, const char* mode) noexcept {
-        TIFF* const tiff = TIFFOpen(path.c_str(), mode);
+    std::shared_ptr<TIFF> SafeTIFFOpen(std::string_view path, const char* mode) noexcept {
+        TIFF* const tiff = TIFFOpen(std::string(path).c_str(), mode);
         if (tiff == nullptr) {
             msg::Output(msg::Type::Error, "util::SafeTIFFOpen", "Could not open the tiff");
         }

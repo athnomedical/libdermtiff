@@ -47,7 +47,7 @@ const std::string path = "image.tiff";
 if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
     // Read original image
     std::vector<uint32_t> raster(dermTiff.width * dermTiff.height);
-    if (ldt::io::ReadOriginalImage(path, raster.data()) {
+    if (ldt::io::ReadOriginalImage(path, raster.data())) {
         // Success
     } else {
         // Failure

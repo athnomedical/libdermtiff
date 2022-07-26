@@ -21,13 +21,13 @@ namespace ldt::msg {
     }
 
     bool stdErrWhenNoCallback = true;
-    std::function<void(Type, const std::string&)> callback;
+    std::function<void(Type, std::string_view)> callback;
 
     void SetStdErrWhenNoCallback(bool enable) {
         stdErrWhenNoCallback = enable;
     }
 
-    void Output(Type type, const std::string& funcName, const std::string& message) {
+    void Output(Type type, std::string_view funcName, std::string_view message) {
         if (callback) {
             callback(type, message);
         } else if (stdErrWhenNoCallback) {
@@ -37,11 +37,11 @@ namespace ldt::msg {
         }
     }
 
-    void RegisterCallback(const std::function<void(Type, const std::string&)>& _callback) {
+    void RegisterCallback(const std::function<void(Type, std::string_view)>& _callback) {
         callback = _callback;
     }
 
     void RemoveCallback() {
-        callback = std::function<void(Type, const std::string&)>();
+        callback = std::function<void(Type, std::string_view)>();
     }
 }

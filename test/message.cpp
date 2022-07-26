@@ -1,42 +1,28 @@
-#include <assert.h>
+#define CATCH_CONFIG_MAIN
 
-#include <iostream>
-
+#include "catch2/catch.hpp"
 #include "libdermtiff/dermtiff.hpp"
 
-bool called = false;
-
-std::string TypeToStr(ldt::msg::Type type) {
-    switch (type) {
-    case ldt::msg::Type::Info:
-        return "Info";
-    case ldt::msg::Type::Warning:
-        return "Warning";
-    case ldt::msg::Type::Error:
-        return "Error";
-    default:
-        assert(false);
-        return "Undefined";
-    }
+TEST_CASE("Register callback and call", "[msg::RegisterCallback]") {
+    bool called = false;
+    ldt::msg::RegisterCallback([&called](auto, auto) { called = true; });
+    ldt::io::OpenTIFF("");  // Open nothing to trigger an error
+    REQUIRE(called);
 }
 
-void callback(ldt::msg::Type type, const std::string &message) {
-    std::cout << "[" << TypeToStr(type) << "] " << message << std::endl;
-    called = true;
-}
-
-int main() {
-    ldt::msg::RegisterCallback(callback);
-
-    ldt::io::OpenTIFF("");
-    assert(called);
-    called = false;
-
+TEST_CASE("Remove callback", "[msg::RegisterCallback]") {
+    bool called = false;
+    ldt::msg::RegisterCallback([&called](auto, auto) { called = true; });
     ldt::msg::RemoveCallback();
+    ldt::io::OpenTIFF("");  // Open nothing to trigger an error
+    REQUIRE_FALSE(called);
+}
 
-    ldt::io::OpenTIFF("");
-    assert(!called);
-    called = false;
-
-    return 0;
+TEST_CASE("Overwrite callback", "[msg::RegisterCallback]") {
+    bool called = false, called2 = false;
+    ldt::msg::RegisterCallback([&called](auto, auto) { called = true; });
+    ldt::msg::RegisterCallback([&called2](auto, auto) { called2 = true; });
+    ldt::io::OpenTIFF("");  // Open nothing to trigger an error
+    REQUIRE_FALSE(called);
+    REQUIRE(called2);
 }

@@ -43,7 +43,7 @@ namespace ldt {
         a = _a;
     }
 
-    std::optional<Pencil> Pencil::Parse(const std::string& str) {
+    std::optional<Pencil> Pencil::Parse(std::string_view str) {
         Pencil pencil;
 
         const auto index = str.find('/');
@@ -52,7 +52,7 @@ namespace ldt {
             return std::nullopt;
         }
 
-        std::string pencilName = str.substr(0, index);
+        std::string pencilName = std::string(str.substr(0, index));
         _internal::trimSpaces(pencilName);
         if (pencilName.empty()) {
             msg::Output(msg::Type::Error, "Pencil::Parse", "Empty pencil name");
@@ -62,7 +62,7 @@ namespace ldt {
         strcpy(pencil.name, pencilName.c_str());
 
         try {
-            auto colorString = str.substr(index + 1, str.length() - index);
+            std::string colorString = std::string(str.substr(index + 1, str.length() - index));
             _internal::trimSpaces(colorString);
             _internal::trim(colorString, "()");
             std::stringstream stream{colorString};
