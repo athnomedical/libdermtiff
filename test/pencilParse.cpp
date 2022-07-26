@@ -1,47 +1,85 @@
-#include <assert.h>
+#define CATCH_CONFIG_MAIN
 
 #include <sstream>
 
+#include "catch2/catch.hpp"
 #include "libdermtiff/dermtiff.hpp"
 
-bool testPencilStr(const std::string& str, const std::string& name, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    const auto result = ldt::Pencil::Parse(str);
-    const auto parsed = ldt::Pencil{name, r, g, b, a};
-    return result.has_value() && result.value() == parsed;
-}
-
-bool testPencil(const std::string& name, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+std::string CreatePencilString(const std::string& name, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     std::stringstream ss;
     ss << name << "/(" << +r << "," << +g << "," << +b << "," << +a << ")";
-    return testPencilStr(ss.str(), name, r, g, b, a);
+    return ss.str();
 }
 
-int main() {
-    assert(testPencil("pencil", 255, 255, 255, 255));
+bool TestPencilStringFormat(const ldt::Pencil& pencil) {
+    return CreatePencilString(pencil.name, pencil.r, pencil.g, pencil.b, pencil.a) == pencil.toString();
+}
 
-    assert(testPencil("pencil", 0, 10, 100, 255));
+bool TestStringParseToPencil(std::string_view str, const ldt::Pencil& pencil) {
+    return ldt::Pencil::Parse(str) == pencil;
+}
 
-    assert(testPencilStr("pencil/( 0 , 0 , 0 , 0 )", "pencil", 0, 0, 0, 0));
+TEST_CASE("Max pencil name length is 64", "[Pencil]") {
+    const std::string validName   = std::string(64, 'a');  // aaa...aaa
+    const std::string invalidName = validName + 'b';       // aaa...aaab
 
-    assert(testPencilStr("pencil/ (0,0,0,0) ", "pencil", 0, 0, 0, 0));
+    SECTION("Able to set 64 chars") {
+        const auto pencil = ldt::Pencil{validName, 255, 255, 255, 255};
+        REQUIRE(validName == pencil.name);
+    }
 
-    assert(testPencilStr(" pencil /(0,0,0,0)", "pencil", 0, 0, 0, 0));
+    SECTION("Unable to set 64 chars") {
+        const auto pencil = ldt::Pencil{invalidName, 255, 255, 255, 255};
+        REQUIRE_FALSE(invalidName == pencil.name);
 
-    assert(!ldt::Pencil::Parse("").has_value());
+        SECTION("Name is trimmed") {
+            REQUIRE(validName == pencil.name);
+        }
+    }
+}
 
-    assert(!ldt::Pencil::Parse("/").has_value());
+TEST_CASE("Pencil string is 'name/(r,g,b,a)'", "[Pencil::toString]") {
+    REQUIRE(TestPencilStringFormat(ldt::Pencil{"pencil", 1, 2, 3, 4}));
+    REQUIRE(TestPencilStringFormat(ldt::Pencil{"pencil", 255, 255, 255, 255}));
+    REQUIRE(TestPencilStringFormat(ldt::Pencil{"pencil", 0, 10, 100, 255}));
+}
 
-    assert(!ldt::Pencil::Parse("/()").has_value());
+TEST_CASE("Parse string to Pencil", "[Pencil::Parse]") {
+    SECTION("Spaces in color") {
+        REQUIRE(TestStringParseToPencil("pencil/( 1 , 2 , 3 , 4 )", ldt::Pencil{"pencil", 1, 2, 3, 4}));
+    }
 
-    assert(!ldt::Pencil::Parse("/(,,,)").has_value());
+    SECTION("Spaces at edges of color") {
+        REQUIRE(TestStringParseToPencil("pencil/ (1,2,3,4) ", ldt::Pencil{"pencil", 1, 2, 3, 4}));
+    }
 
-    assert(!ldt::Pencil::Parse("//(0,0,0,0)").has_value());
+    SECTION("Spaces at edges of name") {
+        REQUIRE(TestStringParseToPencil(" pencil /(1,2,3,4)", ldt::Pencil{"pencil", 1, 2, 3, 4}));
+    }
+}
 
-    assert(!ldt::Pencil::Parse("pencil/()").has_value());
+TEST_CASE("Unparsable string to Pencil", "[Pencil::Parse]") {
+    SECTION("Empty string") {
+        REQUIRE_FALSE(ldt::Pencil::Parse("").has_value());
+    }
 
-    assert(!ldt::Pencil::Parse("pencil//(0,0,0,0)").has_value());
+    SECTION("Empty name and color") {
+        REQUIRE_FALSE(ldt::Pencil::Parse("/").has_value());
 
-    assert(!ldt::Pencil::Parse("pencil/(0,0,0)").has_value());
+        REQUIRE_FALSE(ldt::Pencil::Parse("/()").has_value());
 
-    return 0;
+        REQUIRE_FALSE(ldt::Pencil::Parse("/(,,,)").has_value());
+    }
+
+    SECTION("Double slash") {
+        REQUIRE_FALSE(ldt::Pencil::Parse("//(0,0,0,0)").has_value());
+
+        REQUIRE_FALSE(ldt::Pencil::Parse("pencil//(0,0,0,0)").has_value());
+    }
+
+    SECTION("Color is not enough") {
+        REQUIRE_FALSE(ldt::Pencil::Parse("pencil/()").has_value());
+
+        REQUIRE_FALSE(ldt::Pencil::Parse("pencil/(0,0,0)").has_value());
+    }
 }
