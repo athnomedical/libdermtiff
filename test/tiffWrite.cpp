@@ -1,10 +1,10 @@
-#include <assert.h>
+#define CATCH_CONFIG_RUNNER
 
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <vector>
 
+#include "catch2/catch.hpp"
 #include "libdermtiff/dermtiff.hpp"
 
 struct Color {
@@ -13,130 +13,133 @@ struct Color {
 
 using Image = std::vector<Color>;
 
-bool write(const std::string& path, uint32_t width, uint32_t height, Image& image) {
-    std::vector<uint32_t*> rasters(1);
-    rasters[0] = reinterpret_cast<uint32_t*>(image.data());
-    std::vector<ldt::Pencil> pencils;
+bool WriteTIFF(std::string_view path, uint32_t width, uint32_t height) {
+    Image image(width * height);
+    std::vector<uint32_t*> rasters = {reinterpret_cast<uint32_t*>(image.data())};
+    return ldt::io::WriteTIFF(path, 0, width, height, rasters.data(), nullptr);
+}
+
+bool WriteTIFFWithPencils(std::string_view path, uint32_t width, uint32_t height, std::vector<ldt::Pencil>& pencils) {
+    std::vector<Image> images(1 + pencils.size());
+    std::vector<uint32_t*> rasters(1 + pencils.size());
+
+    // Original image
+    images[0] = Image(width * height);
+
+    // Layers
+    for (uint16_t i = 0; i < pencils.size(); i++) {
+        images[i + 1] = Image(width * height, {pencils[i].r, pencils[i].g, pencils[i].b, pencils[i].a});
+    }
+
+    // To pointer
+    for (size_t i = 0; i < images.size(); i++) {
+        rasters[i] = reinterpret_cast<uint32_t*>(images[i].data());
+    }
+
     return ldt::io::WriteTIFF(
         path, static_cast<uint16_t>(pencils.size()), width, height, rasters.data(), pencils.data());
 }
 
-bool writeWithPencils(
-    const std::string& path, uint32_t width, uint32_t height, Image& image, std::vector<ldt::Pencil>& pencils) {
-    const auto size = width * height;
-    Image layer(size);
-    for (uint32_t i = 0; i < size; i++) {
-        layer[i].r = 50;
-        layer[i].g = 50;
-        layer[i].b = 200;
-        layer[i].a = 255;
-    }
-    std::vector<uint32_t*> rasters(pencils.size() + 1);
-    rasters[0] = reinterpret_cast<uint32_t*>(image.data());
-    for (size_t i = 1; i < rasters.size(); i++) {
-        rasters[i] = reinterpret_cast<uint32_t*>(layer.data());
-    }
-    return ldt::io::WriteTIFF(
-        path, static_cast<uint16_t>(pencils.size()), width, height, rasters.data(), pencils.data());
-}
-
-bool read(const std::string& path, const std::vector<ldt::Pencil>& pencils = std::vector<ldt::Pencil>()) {
+bool ReadTIFF(std::string_view path, const std::vector<ldt::Pencil>& pencils = std::vector<ldt::Pencil>()) {
     if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
-        // read layers
-        if (!pencils.empty()) {
-            const uint16_t layerCount = static_cast<uint16_t>(pencils.size());
-            for (uint16_t layerIndex = 0; layerIndex < layerCount; layerIndex++) {
-                if (ldt::Pencil pencil;
-                    ldt::io::ReadLayer(path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
-                    // compare pencil
-                    return pencil == pencils[layerIndex];
-                } else {
-                    return false;
-                }
+
+        // Read original image
+        if (!ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
+            return false;
+        }
+
+        // Read layers
+        for (uint16_t i = 0; i < pencils.size(); i++) {
+            ldt::Pencil pencil;
+            if (!ldt::io::ReadLayer(path, i, reinterpret_cast<uint32_t*>(raster.data()), &pencil)
+                || pencil != pencils[i]) {
+                return false;
             }
         }
-        // read original image
-        else {
-            return ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()));
-        }
+
+        return true;
     }
     return false;
 }
 
-std::string getOutPath() {
+std::string GetOutPath() {
     static int i = 0;
     return "../test/out/out" + std::to_string(i++) + ".tiff";
 }
 
-void TestWriteRead(bool writable, bool readable, uint32_t width, uint32_t height, Image& image) {
-    const auto file        = getOutPath();
-    const auto writeResult = write(file, width, height, image);
-    assert(writeResult == writable);
-    const auto readResult = read(file);
-    assert(readResult == readable);
+std::pair<bool, bool> WriteRead(uint32_t width, uint32_t height) {
+    const auto file        = GetOutPath();
+    const auto writeResult = WriteTIFF(file, width, height);
+    const auto readResult  = ReadTIFF(file);
+    return {writeResult, readResult};
 }
 
-void TestWriteReadPencil(
-    bool writable, bool readable, uint32_t width, uint32_t height, Image& image, std::vector<ldt::Pencil>& pencils) {
-    const auto file        = getOutPath();
-    const auto writeResult = writeWithPencils(file, width, height, image, pencils);
-    assert(writeResult == writable);
-    const auto readResult = read(file, pencils);
-    assert(readResult == readable);
+std::pair<bool, bool> WriteReadWithPencils(uint32_t width, uint32_t height, std::vector<ldt::Pencil>& pencils) {
+    const auto file        = GetOutPath();
+    const auto writeResult = WriteTIFFWithPencils(file, width, height, pencils);
+    const auto readResult  = ReadTIFF(file, pencils);
+    return {writeResult, readResult};
 }
 
-int main() {
-    // delete all tiff files exist
-    for (auto& file : std::filesystem::directory_iterator("../test/out/")) {
+TEST_CASE("Write", "[io::WriteTIFF]") {
+    SECTION("Without pencils") {
+        const auto [writeResult, readResult] = WriteRead(255, 255);
+
+        REQUIRE(writeResult);
+        REQUIRE(readResult);
+    }
+
+    SECTION("With two pencils") {
+        std::vector<ldt::Pencil> pencils = {{"pencil"}, {"pencil2"}};
+
+        const auto [writeResult, readResult] = WriteReadWithPencils(255, 255, pencils);
+
+        REQUIRE(writeResult);
+        REQUIRE(readResult);
+    }
+
+    SECTION("Max size") {
+        const auto [writeResult, readResult] = WriteRead(ldt::DermTIFF::MaxWidth, ldt::DermTIFF::MaxHeight);
+
+        REQUIRE(writeResult);
+        REQUIRE(readResult);
+    }
+}
+
+TEST_CASE("Not writable", "[io::WriteTIFF]") {
+    SECTION("Invalid pencil") {
+        std::vector<ldt::Pencil> pencils = {{""}};
+
+        const auto [writeResult, readResult] = WriteReadWithPencils(255, 255, pencils);
+
+        REQUIRE_FALSE(writeResult);
+        REQUIRE_FALSE(readResult);
+    }
+
+    SECTION("Larger than max width") {
+        const auto [writeResult, readResult] = WriteRead(ldt::DermTIFF::MaxWidth + 1, 255);
+
+        REQUIRE_FALSE(writeResult);
+        REQUIRE_FALSE(readResult);
+    }
+
+    SECTION("Larger than max height") {
+        const auto [writeResult, readResult] = WriteRead(255, ldt::DermTIFF::MaxHeight + 1);
+
+        REQUIRE_FALSE(writeResult);
+        REQUIRE_FALSE(readResult);
+    }
+}
+
+int main(int argc, char* argv[]) {
+    // Delete all output files
+    for (const auto& file : std::filesystem::directory_iterator("../test/out/")) {
         if (file.path().filename() != ".gitkeep") {
             std::filesystem::remove(file);
         }
     }
 
-    {
-        // Basic write / read without pencil
-        const uint32_t width = 255, height = 255;
-        Image image(width * height);
-        TestWriteRead(true, true, width, height, image);
-    }
-
-    {
-        // With invalid pencil name
-        const uint32_t width = 255, height = 255;
-        Image image(width * height);
-        std::vector<ldt::Pencil> pencils = {{""}};
-        TestWriteReadPencil(false, false, width, height, image, pencils);
-    }
-
-    {
-        // With two pencils
-        const uint32_t width = 255, height = 255;
-        Image image(width * height);
-        std::vector<ldt::Pencil> pencils = {{"pencil"}, {"pencil2"}};
-        TestWriteReadPencil(true, true, width, height, image, pencils);
-    }
-
-    {
-        // Larger than max width
-        const uint32_t width = ldt::DermTIFF::MaxWidth + 1, height = 1;
-        Image image(width * height);
-        TestWriteRead(false, false, width, height, image);
-    }
-
-    {
-        // Larger than max height
-        const uint32_t width = 1, height = ldt::DermTIFF::MaxHeight + 1;
-        Image image(width * height);
-        TestWriteRead(false, false, width, height, image);
-    }
-
-    {
-        // Max size
-        const uint32_t width = ldt::DermTIFF::MaxWidth, height = ldt::DermTIFF::MaxHeight;
-        Image image(width * height);
-        TestWriteRead(true, true, width, height, image);
-    }
-
-    return 0;
+    // Run tests
+    return Catch::Session().run(argc, argv);
 }
