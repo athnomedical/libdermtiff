@@ -95,8 +95,8 @@ namespace ldt::io {
                    uint16_t layerCount,
                    uint32_t width,
                    uint32_t height,
-                   uint32_t* rasters[],
-                   Pencil pencils[]) {
+                   uint32_t** rasters,
+                   Pencil* pencils) {
         const uint16_t pageCount = layerCount + 1;
 
         // check parameters
