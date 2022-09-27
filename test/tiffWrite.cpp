@@ -35,7 +35,7 @@ bool WriteTIFF(std::string_view path, uint32_t width, uint32_t height, const std
 }
 
 bool ReadTIFF(std::string_view path, const std::vector<ldt::Pencil>& pencils) {
-    if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::OpenTIFF(path.data()); dermTiff.isValid) {
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
 
         // Read original image

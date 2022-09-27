@@ -18,7 +18,7 @@ bool ReadLibtiffImage(const std::string& filename) {
     std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "Read libtiff image: " << path << std::endl;
 
-    if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::OpenTIFF(path.c_str()); dermTiff.isValid) {
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
         ldt::Pencil pencil;
         for (uint16_t i = 0; i < dermTiff.layerCount + 1; i++) {
@@ -36,7 +36,7 @@ bool ReadDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
     std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "Read DermAnnotation TIFF image: " << path << std::endl;
 
-    if (const auto dermTiff = ldt::io::OpenTIFF(path); dermTiff.isValid) {
+    if (const auto dermTiff = ldt::io::OpenTIFF(path.c_str()); dermTiff.isValid) {
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
 
         // Read original image
