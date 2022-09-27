@@ -1,0 +1,7 @@
+EXPORTS
+    OpenTIFF @1
+    ReadPage @2
+    ReadOriginalImage @3
+    ReadLayer @4
+    WriteTIFF @5
+    SetStdErrWhenNoCallback @6
