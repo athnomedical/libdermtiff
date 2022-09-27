@@ -22,7 +22,7 @@ bool ReadLibtiffImage(const std::string& filename) {
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
         ldt::Pencil pencil;
         for (uint16_t i = 0; i < dermTiff.layerCount + 1; i++) {
-            if (!ldt::io::ReadPage(path, i, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
+            if (!ldt::io::ReadPage(path.c_str(), i, reinterpret_cast<uint32_t*>(raster.data()), &pencil)) {
                 return false;
             }
         }
@@ -40,7 +40,7 @@ bool ReadDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
 
         // Read original image
-        if (!ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
+        if (!ldt::io::ReadOriginalImage(path.c_str(), reinterpret_cast<uint32_t*>(raster.data()))) {
             return false;
         }
 
@@ -48,7 +48,7 @@ bool ReadDermTiffImage(const std::string& filename, const std::vector<ldt::Penci
         std::vector<ldt::Pencil> tiffPencils(dermTiff.layerCount);
         for (uint16_t layerIndex = 0; layerIndex < dermTiff.layerCount; layerIndex++) {
             if (!ldt::io::ReadLayer(
-                    path, layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &tiffPencils[layerIndex])) {
+                    path.c_str(), layerIndex, reinterpret_cast<uint32_t*>(raster.data()), &tiffPencils[layerIndex])) {
                 return false;
             }
         }

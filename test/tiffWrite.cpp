@@ -31,7 +31,7 @@ bool WriteTIFF(std::string_view path, uint32_t width, uint32_t height, const std
     }
 
     return ldt::io::WriteTIFF(
-        path, static_cast<uint16_t>(pencils.size()), width, height, rasters.data(), pencils.data());
+        path.data(), static_cast<uint16_t>(pencils.size()), width, height, rasters.data(), pencils.data());
 }
 
 bool ReadTIFF(std::string_view path, const std::vector<ldt::Pencil>& pencils) {
@@ -39,14 +39,14 @@ bool ReadTIFF(std::string_view path, const std::vector<ldt::Pencil>& pencils) {
         Image raster(static_cast<size_t>(dermTiff.width) * dermTiff.height);
 
         // Read original image
-        if (!ldt::io::ReadOriginalImage(path, reinterpret_cast<uint32_t*>(raster.data()))) {
+        if (!ldt::io::ReadOriginalImage(path.data(), reinterpret_cast<uint32_t*>(raster.data()))) {
             return false;
         }
 
         // Read layers
         for (uint16_t i = 0; i < pencils.size(); i++) {
             ldt::Pencil pencil;
-            if (!ldt::io::ReadLayer(path, i, reinterpret_cast<uint32_t*>(raster.data()), &pencil)
+            if (!ldt::io::ReadLayer(path.data(), i, reinterpret_cast<uint32_t*>(raster.data()), &pencil)
                 || pencil != pencils[i]) {
                 return false;
             }
