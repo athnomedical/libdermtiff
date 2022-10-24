@@ -84,6 +84,8 @@ namespace ldt {
 
     DermTIFF::DermTIFF(std::string_view path) : DermTIFF(util::SafeTIFFOpen(path, "r").get()) {}
 
+    DermTIFF::DermTIFF(std::wstring_view path) : DermTIFF(util::SafeTIFFOpen(path, "r").get()) {}
+
     DermTIFF::DermTIFF(TIFF* const tiff) :
         pageCount(_internal::SafeTIFFGetValue(tiff, TIFFNumberOfDirectories)),
         layerCount(pageCount - 1),

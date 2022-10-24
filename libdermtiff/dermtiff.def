@@ -1,7 +1,13 @@
+LIBRARY DERMTIFF
 EXPORTS
     OpenTIFF @1
-    ReadPage @2
-    ReadOriginalImage @3
-    ReadLayer @4
-    WriteTIFF @5
-    SetStdErrWhenNoCallback @6
+    OpenTIFFW @2
+    ReadPage @3
+    ReadPageW @4
+    ReadOriginalImage @5
+    ReadOriginalImageW @6
+    ReadLayer @7
+    ReadLayerW @8
+    WriteTIFF @9
+    WriteTIFFW @10
+    SetStdErrWhenNoCallback @11

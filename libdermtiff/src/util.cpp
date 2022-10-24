@@ -23,6 +23,13 @@ namespace ldt::util {
                 return value;
             }
         }
+
+        std::shared_ptr<TIFF> TIFFOpen(TIFF* const tiff) {
+            if (tiff == nullptr) {
+                msg::Output(msg::Type::Error, "util::SafeTIFFOpen", "Could not open the tiff");
+            }
+            return std::shared_ptr<TIFF>(tiff, _internal::SafeTIFFClose);
+        }
     }
 
     template <>
@@ -36,10 +43,10 @@ namespace ldt::util {
     }
 
     std::shared_ptr<TIFF> SafeTIFFOpen(std::string_view path, const char* mode) noexcept {
-        TIFF* const tiff = TIFFOpen(std::string(path).c_str(), mode);
-        if (tiff == nullptr) {
-            msg::Output(msg::Type::Error, "util::SafeTIFFOpen", "Could not open the tiff");
-        }
-        return std::shared_ptr<TIFF>(tiff, _internal::SafeTIFFClose);
+        return _internal::TIFFOpen(TIFFOpen(std::string(path).c_str(), mode));
+    }
+
+    std::shared_ptr<TIFF> SafeTIFFOpen(std::wstring_view path, const char* mode) noexcept {
+        return _internal::TIFFOpen(TIFFOpenW(std::wstring(path).c_str(), mode));
     }
 }

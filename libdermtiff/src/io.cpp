@@ -9,51 +9,47 @@
 
 namespace ldt::io {
     namespace _internal {
-        namespace writer {
-            bool TIFFSetDefaultFields(
-                TIFF* const tiff, uint32_t width, uint32_t height, uint16_t page, uint16_t pageCount) {
-                constexpr int16_t extraSamples[] = {EXTRASAMPLE_UNASSALPHA};
-                const auto result                = TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH, width) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_IMAGELENGTH, height) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_ADOBE_DEFLATE) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_SAMPLESPERPIXEL, 4) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_EXTRASAMPLES, 1, extraSamples) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_BITSPERSAMPLE, 8) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE) == 1
-                                    && TIFFSetField(tiff, TIFFTAG_PAGENUMBER, page, pageCount) == 1;
+        bool TIFFSetDefaultFields(
+            TIFF* const tiff, uint32_t width, uint32_t height, uint16_t page, uint16_t pageCount) {
+            constexpr int16_t extraSamples[] = {EXTRASAMPLE_UNASSALPHA};
+            const auto result                = TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH, width) == 1
+                                && TIFFSetField(tiff, TIFFTAG_IMAGELENGTH, height) == 1
+                                && TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_ADOBE_DEFLATE) == 1
+                                && TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB) == 1
+                                && TIFFSetField(tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG) == 1
+                                && TIFFSetField(tiff, TIFFTAG_SAMPLESPERPIXEL, 4) == 1
+                                && TIFFSetField(tiff, TIFFTAG_EXTRASAMPLES, 1, extraSamples) == 1
+                                && TIFFSetField(tiff, TIFFTAG_BITSPERSAMPLE, 8) == 1
+                                && TIFFSetField(tiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT) == 1
+                                && TIFFSetField(tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE) == 1
+                                && TIFFSetField(tiff, TIFFTAG_PAGENUMBER, page, pageCount) == 1;
 
-                if (!result) {
-                    msg::Output(msg::Type::Error, "io::TIFFSetDefaultFields", "Could not set some tiff tags");
-                }
-
-                return result;
+            if (!result) {
+                msg::Output(msg::Type::Error, "io::TIFFSetDefaultFields", "Could not set some tiff tags");
             }
 
-            bool WriteImage(TIFF* const tiff, uint32_t width, uint32_t height, const uint32_t* const raster) {
-                for (uint32_t y = 0; y < height; y++) {
-                    const auto pos = y * width;
-                    // raster + pos is the pointer of the image[y][0]
-                    // Since libtiff interface does not support const, so use const_cast to remove const
-                    // Writing process only reads the value, there is no change
-                    if (TIFFWriteScanline(tiff, static_cast<void*>(const_cast<uint32_t*>(raster) + pos), y) != 1) {
-                        msg::Output(msg::Type::Error, "io::WriteImage", "Could not write the image");
-                        return false;
-                    }
-                }
-                return true;
-            }
+            return result;
         }
-    }
 
-    DermTIFF OpenTIFF(const char* filepath) {
-        return DermTIFF(filepath);
-    }
+        bool WriteImage(TIFF* const tiff, uint32_t width, uint32_t height, const uint32_t* const raster) {
+            for (uint32_t y = 0; y < height; y++) {
+                const auto pos = y * width;
+                // raster + pos is the pointer of the image[y][0]
+                // Since libtiff interface does not support const, so use const_cast to remove const
+                // Writing process only reads the value, there is no change
+                if (TIFFWriteScanline(tiff, static_cast<void*>(const_cast<uint32_t*>(raster) + pos), y) != 1) {
+                    msg::Output(msg::Type::Error, "io::WriteImage", "Could not write the image");
+                    return false;
+                }
+            }
+            return true;
+        }
 
-    bool ReadPage(const char* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
+        bool ReadPageImpl(const std::shared_ptr<TIFF>& tiffPtr,
+                          uint16_t page,
+                          uint32_t* raster,
+                          Pencil* pencil,
+                          Orientation orientation) {
             TIFF* const tiff    = tiffPtr.get();
             const auto dermTiff = DermTIFF(tiff);
 
@@ -81,45 +77,32 @@ namespace ldt::io {
             return true;
         }
 
-        return false;
-    }
+        bool WriteTIFFImpl(const std::shared_ptr<TIFF>& tiffPtr,
+                           uint16_t layerCount,
+                           uint32_t width,
+                           uint32_t height,
+                           const uint32_t* const* const rasters,
+                           const Pencil* const pencils) {
+            const uint16_t pageCount = layerCount + 1;
 
-    bool ReadOriginalImage(const char* filepath, uint32_t* raster, Orientation orientation) {
-        return ReadPage(filepath, 0, &*raster, nullptr, orientation);
-    }
-
-    bool ReadLayer(
-        const char* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        return ReadPage(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
-    }
-
-    bool WriteTIFF(const char* filepath,
-                   uint16_t layerCount,
-                   uint32_t width,
-                   uint32_t height,
-                   const uint32_t* const* const rasters,
-                   const Pencil* const pencils) {
-        const uint16_t pageCount = layerCount + 1;
-
-        // check parameters
-        if (width > DermTIFF::MaxWidth || height > DermTIFF::MaxHeight) {
-            msg::Output(msg::Type::Error, "io::WriteTIFF", "Too large to write");
-            return false;
-        }
-        for (uint16_t i = 0; i < layerCount; i++) {
-            // layer has pencil with empty name
-            if (!pencils[i].toString().has_value()) {
+            // check parameters
+            if (width > DermTIFF::MaxWidth || height > DermTIFF::MaxHeight) {
+                msg::Output(msg::Type::Error, "io::WriteTIFF", "Too large to write");
                 return false;
             }
-        }
+            for (uint16_t i = 0; i < layerCount; i++) {
+                // layer has pencil with empty name
+                if (!pencils[i].toString().has_value()) {
+                    return false;
+                }
+            }
 
-        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "w"); tiffPtr) {
             TIFF* const tiff = tiffPtr.get();
 
             for (uint16_t page = 0; page < pageCount; page++) {
                 TIFFCreateDirectory(tiff);
 
-                if (_internal::writer::TIFFSetDefaultFields(tiff, width, height, page, pageCount)) {
+                if (TIFFSetDefaultFields(tiff, width, height, page, pageCount)) {
                     // layers
                     if (page != 0) {
                         const auto penStr = pencils[page - 1].toString();
@@ -132,7 +115,7 @@ namespace ldt::io {
                     return false;
                 }
 
-                if (!_internal::writer::WriteImage(tiff, width, height, &*(rasters[page]))) {
+                if (!WriteImage(tiff, width, height, &*(rasters[page]))) {
                     return false;
                 }
 
@@ -141,7 +124,71 @@ namespace ldt::io {
 
             return true;
         }
+    }
 
+    DermTIFF OpenTIFF(const char* filepath) {
+        return DermTIFF(filepath);
+    }
+
+    DermTIFF OpenTIFFW(const wchar_t* filepath) {
+        return DermTIFF(filepath);
+    }
+
+    bool ReadPage(const char* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
+            return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
+        }
+
+        return false;
+    }
+
+    bool ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
+            return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
+        }
+
+        return false;
+    }
+
+    bool ReadOriginalImage(const char* filepath, uint32_t* raster, Orientation orientation) {
+        return ReadPage(filepath, 0, &*raster, nullptr, orientation);
+    }
+
+    bool ReadOriginalImageW(const wchar_t* filepath, uint32_t* raster, Orientation orientation) {
+        return ReadPageW(filepath, 0, &*raster, nullptr, orientation);
+    }
+
+    bool ReadLayer(
+        const char* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        return ReadPage(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
+    }
+
+    bool ReadLayerW(
+        const wchar_t* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        return ReadPageW(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
+    }
+
+    bool WriteTIFF(const char* filepath,
+                   uint16_t layerCount,
+                   uint32_t width,
+                   uint32_t height,
+                   const uint32_t* const* const rasters,
+                   const Pencil* const pencils) {
+        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "w"); tiffPtr) {
+            return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
+        }
+        return false;
+    }
+
+    bool WriteTIFFW(const wchar_t* filepath,
+                    uint16_t layerCount,
+                    uint32_t width,
+                    uint32_t height,
+                    const uint32_t* const* const rasters,
+                    const Pencil* const pencils) {
+        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "w"); tiffPtr) {
+            return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
+        }
         return false;
     }
 }
