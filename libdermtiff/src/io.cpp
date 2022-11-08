@@ -143,7 +143,7 @@ namespace ldt::io {
     }
 
     bool ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
+        if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
 
@@ -186,7 +186,7 @@ namespace ldt::io {
                     uint32_t height,
                     const uint32_t* const* const rasters,
                     const Pencil* const pencils) {
-        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "w"); tiffPtr) {
+        if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "w"); tiffPtr) {
             return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
         }
         return false;
