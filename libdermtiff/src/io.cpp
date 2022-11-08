@@ -130,20 +130,8 @@ namespace ldt::io {
         return DermTIFF(filepath);
     }
 
-    DermTIFF OpenTIFFW(const wchar_t* filepath) {
-        return DermTIFF(filepath);
-    }
-
     bool ReadPage(const char* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
-            return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
-        }
-
-        return false;
-    }
-
-    bool ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
 
@@ -154,18 +142,9 @@ namespace ldt::io {
         return ReadPage(filepath, 0, &*raster, nullptr, orientation);
     }
 
-    bool ReadOriginalImageW(const wchar_t* filepath, uint32_t* raster, Orientation orientation) {
-        return ReadPageW(filepath, 0, &*raster, nullptr, orientation);
-    }
-
     bool ReadLayer(
         const char* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         return ReadPage(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
-    }
-
-    bool ReadLayerW(
-        const wchar_t* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        return ReadPageW(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
     }
 
     bool WriteTIFF(const char* filepath,
@@ -180,6 +159,28 @@ namespace ldt::io {
         return false;
     }
 
+#ifdef _WIN32
+    DermTIFF OpenTIFFW(const wchar_t* filepath) {
+        return DermTIFF(filepath);
+    }
+
+    bool ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "r"); tiffPtr) {
+            return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
+        }
+
+        return false;
+    }
+
+    bool ReadOriginalImageW(const wchar_t* filepath, uint32_t* raster, Orientation orientation) {
+        return ReadPageW(filepath, 0, &*raster, nullptr, orientation);
+    }
+
+    bool ReadLayerW(
+        const wchar_t* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+        return ReadPageW(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
+    }
+
     bool WriteTIFFW(const wchar_t* filepath,
                     uint16_t layerCount,
                     uint32_t width,
@@ -191,4 +192,5 @@ namespace ldt::io {
         }
         return false;
     }
+#endif
 }

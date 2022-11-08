@@ -38,8 +38,10 @@ namespace ldt {
 
         explicit DermTIFF(std::string_view path);
 
-        explicit DermTIFF(std::wstring_view path);
-
         explicit DermTIFF(TIFF* const tiff);
+
+#ifdef _WIN32
+        explicit DermTIFF(std::wstring_view path);
+#endif
     };
 }

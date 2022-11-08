@@ -46,7 +46,9 @@ namespace ldt::util {
         return _internal::TIFFOpen(TIFFOpen(std::string(path).c_str(), mode));
     }
 
+#ifdef _WIN32
     std::shared_ptr<TIFF> SafeTIFFOpenW(std::wstring_view path, const char* mode) noexcept {
         return _internal::TIFFOpen(TIFFOpenW(std::wstring(path).c_str(), mode));
     }
+#endif
 }
