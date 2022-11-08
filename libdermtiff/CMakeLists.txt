@@ -13,13 +13,21 @@ include_directories(
     "./include/libdermtiff/dermtiff/"
 )
 
-add_library(dermtiff
+set(LIBRARY_SOURCES
     "./src/io.cpp"
     "./src/message.cpp"
     "./src/pencil.cpp"
     "./src/type.cpp"
     "./src/util.cpp"
-    "dermtiff.def"
 )
+
+if(WIN32)
+    set(LIBRARY_SOURCES
+        ${LIBRARY_SOURCES}
+        "dermtiff.def"
+    )
+endif()
+
+add_library(dermtiff ${LIBRARY_SOURCES})
 
 target_link_libraries(dermtiff PRIVATE tiff)
