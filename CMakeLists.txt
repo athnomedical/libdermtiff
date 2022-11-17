@@ -20,7 +20,7 @@ endif()
 
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
-set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/../bin")
+set(OUTPUT_DIR "${PROJECT_SOURCE_DIR}/bin")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
@@ -43,7 +43,7 @@ add_subdirectory("test")
 if(MSVC)
 	set_target_properties(tiff PROPERTIES PREFIX "lib")
 	if(NOT (CMAKE_BUILD_TYPE EQUAL "DEBUG"))
-		FILE(STRINGS "${CMAKE_BINARY_DIR}/../deps/libtiff/configure.ac" configure REGEX "^LIBTIFF_.*=")
+		FILE(STRINGS "${PROJECT_SOURCE_DIR}/deps/libtiff/configure.ac" configure REGEX "^LIBTIFF_.*=")
 		foreach(line ${configure})
 			foreach(var LIBTIFF_CURRENT LIBTIFF_AGE)
 				if(NOT ${var} AND line MATCHES "^${var}=(.*)")
