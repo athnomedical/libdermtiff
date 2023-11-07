@@ -82,24 +82,32 @@ namespace ldt {
         }
     }
 
-    DermTIFF::DermTIFF(std::string_view path) : DermTIFF(util::SafeTIFFOpen(path, "r").get()) {}
+    DermTIFF OpenDermTIFF(TIFF* const tiff) {
+        DermTIFF dermTiff;
+        dermTiff.pageCount       = _internal::SafeTIFFGetValue(tiff, TIFFNumberOfDirectories);
+        dermTiff.layerCount      = dermTiff.pageCount - 1;
+        dermTiff.width           = util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
+        dermTiff.height          = util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
+        dermTiff.isOpened        = tiff != nullptr;
+        dermTiff.isValid         = _internal::Validate(dermTiff, tiff);
+        dermTiff.bitsPerSample   = util::GetField<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE);
+        dermTiff.compression     = util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
+        dermTiff.extraSamples    = _internal::GetExtraSamples(tiff);
+        dermTiff.photometric     = util::GetField<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC);
+        dermTiff.planarConfig    = util::GetField<uint16_t>(tiff, TIFFTAG_PLANARCONFIG);
+        dermTiff.samplesPerPixel = util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL);
+        dermTiff.subFileType     = util::GetField<uint32_t>(tiff, TIFFTAG_SUBFILETYPE);
 
-    DermTIFF::DermTIFF(TIFF* const tiff) :
-        pageCount(_internal::SafeTIFFGetValue(tiff, TIFFNumberOfDirectories)),
-        layerCount(pageCount - 1),
-        width(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH)),
-        height(util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH)),
-        isOpened(tiff != nullptr),
-        isValid(_internal::Validate(*this, tiff)),
-        detail({util::GetField<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE),
-                util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION),
-                _internal::GetExtraSamples(tiff),
-                util::GetField<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC),
-                util::GetField<uint16_t>(tiff, TIFFTAG_PLANARCONFIG),
-                util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL),
-                util::GetField<uint32_t>(tiff, TIFFTAG_SUBFILETYPE)}) {}
+        return dermTiff;
+    }
+
+    DermTIFF OpenDermTIFF(std::string_view path) {
+        return OpenDermTIFF(util::SafeTIFFOpen(path, "r").get());
+    }
 
 #ifdef _WIN32
-    DermTIFF::DermTIFF(std::wstring_view path) : DermTIFF(util::SafeTIFFOpenW(path, "r").get()) {}
+    DermTIFF OpenDermTIFF(std::wstring_view path) {
+        return OpenDermTIFF(util::SafeTIFFOpenW(path, "r").get());
+    }
 #endif
 }

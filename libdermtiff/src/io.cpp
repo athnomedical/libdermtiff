@@ -51,7 +51,7 @@ namespace ldt::io {
                           Pencil* pencil,
                           Orientation orientation) {
             TIFF* const tiff    = tiffPtr.get();
-            const auto dermTiff = DermTIFF(tiff);
+            const auto dermTiff = OpenDermTIFF(tiff);
 
             if (TIFFSetDirectory(tiff, page) != 1) {
                 msg::Output(msg::Type::Error, "io::ReadPage", "Could not set the directory");
@@ -127,7 +127,7 @@ namespace ldt::io {
     }
 
     EXPORT DermTIFF STDCALL OpenTIFF(const char* filepath) {
-        return DermTIFF(filepath);
+        return OpenDermTIFF(filepath);
     }
 
     EXPORT bool STDCALL
@@ -162,7 +162,7 @@ namespace ldt::io {
 
 #ifdef _WIN32
     EXPORT DermTIFF STDCALL OpenTIFFW(const wchar_t* filepath) {
-        return DermTIFF(filepath);
+        return OpenDermTIFF(filepath);
     }
 
     EXPORT bool STDCALL
