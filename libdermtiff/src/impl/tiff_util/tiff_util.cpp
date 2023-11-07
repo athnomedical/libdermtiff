@@ -1,10 +1,10 @@
-#include "tiff_reader.hpp"
+#include "tiff_util.hpp"
 
 #include <libtiff/tiffio.h>
 
 #include "impl/message/message.hpp"
 
-namespace ldt::tiff_reader {
+namespace ldt::tiff_util {
     namespace _internal {
         void CloseTiff(TIFF* const tiff) noexcept {
             if (tiff != nullptr) {
@@ -26,7 +26,7 @@ namespace ldt::tiff_reader {
 
         std::shared_ptr<TIFF> OpenTiff(TIFF* const tiff) {
             if (tiff == nullptr) {
-                msg::Print(msg::Type::Error, "tiff_reader::SafeTIFFOpen", "Could not open the tiff");
+                msg::Print(msg::Type::Error, "tiff_util::SafeTIFFOpen", "Could not open the tiff");
             }
             return std::shared_ptr<TIFF>(tiff, _internal::CloseTiff);
         }

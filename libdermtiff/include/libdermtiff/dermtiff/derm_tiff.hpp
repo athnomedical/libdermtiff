@@ -32,12 +32,4 @@ namespace ldt {
         uint16_t samplesPerPixel;
         uint32_t subFileType;
     };
-
-    DermTIFF OpenDermTiff(TIFF* const tiff);
-
-    DermTIFF OpenDermTiff(std::string_view path);
-
-#ifdef _WIN32
-    DermTIFF OpenDermTiff(std::wstring_view path);
-#endif
 }

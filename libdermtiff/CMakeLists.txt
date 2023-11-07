@@ -9,11 +9,11 @@ endif()
 
 set(DERMTIFF_SOURCES
     "./src/common.cpp"
-    "./src/derm_tiff.cpp"
     "./src/io.cpp"
     "./src/pencil.cpp"
+    "./src/impl/derm_tiff/derm_tiff.cpp"
     "./src/impl/message/message.cpp"
-    "./src/impl/tiff_reader/tiff_reader.cpp"
+    "./src/impl/tiff_util/tiff_util.cpp"
 )
 
 set(DERMTIFF_HEADERS
@@ -30,7 +30,7 @@ target_include_directories(dermtiff
     PRIVATE
     "../deps/libtiff/"
     "../build/deps/libtiff/libtiff/"
-    "./include/libdermtiff/dermtiff/"
+    "./include/libdermtiff/"
     "./src/"
 )
 

@@ -1,4 +1,4 @@
-#include "common.hpp"
+#include "dermtiff/common.hpp"
 
 #define STRINGFY2(s) #s
 #define STRINGFY(s) STRINGFY2(s)

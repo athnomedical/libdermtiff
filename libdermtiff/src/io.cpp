@@ -1,11 +1,12 @@
-#include "io.hpp"
+#include "dermtiff/io.hpp"
 
 #include <libtiff/tiffio.h>
 
 #include <vector>
 
+#include "impl/derm_tiff/derm_tiff.hpp"
 #include "impl/message/message.hpp"
-#include "impl/tiff_reader/tiff_reader.hpp"
+#include "impl/tiff_util/tiff_util.hpp"
 
 namespace ldt::io {
     namespace _internal {
@@ -67,8 +68,7 @@ namespace ldt::io {
 
             if (pencil != nullptr) {
                 // Read pencil
-                if (const auto pagename = tiff_reader::GetFieldOpt<char*>(tiff, TIFFTAG_PAGENAME);
-                    pagename.has_value()) {
+                if (const auto pagename = tiff_util::GetFieldOpt<char*>(tiff, TIFFTAG_PAGENAME); pagename.has_value()) {
                     if (const auto result = Pencil::Parse(pagename.value()); result.has_value()) {
                         *pencil = result.value();
                     }
@@ -133,7 +133,7 @@ namespace ldt::io {
 
     EXPORT bool STDCALL
     ReadPage(const char* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        if (const auto tiffPtr = tiff_reader::OpenTiff(filepath, "r"); tiffPtr) {
+        if (const auto tiffPtr = tiff_util::OpenTiff(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
 
@@ -155,7 +155,7 @@ namespace ldt::io {
                                   uint32_t height,
                                   const uint32_t* const* const rasters,
                                   const Pencil* const pencils) {
-        if (const auto tiffPtr = tiff_reader::OpenTiff(filepath, "w"); tiffPtr) {
+        if (const auto tiffPtr = tiff_util::OpenTiff(filepath, "w"); tiffPtr) {
             return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
         }
         return false;
@@ -168,7 +168,7 @@ namespace ldt::io {
 
     EXPORT bool STDCALL
     ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        if (const auto tiffPtr = tiff_reader::OpenTiffW(filepath, "r"); tiffPtr) {
+        if (const auto tiffPtr = tiff_util::OpenTiffW(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
 
@@ -190,7 +190,7 @@ namespace ldt::io {
                                    uint32_t height,
                                    const uint32_t* const* const rasters,
                                    const Pencil* const pencils) {
-        if (const auto tiffPtr = tiff_reader::OpenTiffW(filepath, "w"); tiffPtr) {
+        if (const auto tiffPtr = tiff_util::OpenTiffW(filepath, "w"); tiffPtr) {
             return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
         }
         return false;

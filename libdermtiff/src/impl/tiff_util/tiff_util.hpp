@@ -9,7 +9,7 @@
 typedef struct tiff TIFF;
 
 namespace ldt {
-    namespace tiff_reader {
+    namespace tiff_util {
         // T: uint16_t and uint32_t are implemented.
         // If could not get the field, 0 will be returned.
         template <typename T>
