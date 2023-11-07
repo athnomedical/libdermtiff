@@ -4,8 +4,8 @@
 
 #include <vector>
 
-#include "message_detail.hpp"
-#include "util.hpp"
+#include "impl/message/message.hpp"
+#include "impl/tiff_reader/tiff_reader.hpp"
 
 namespace ldt::io {
     namespace _internal {
@@ -25,7 +25,7 @@ namespace ldt::io {
                                 && TIFFSetField(tiff, TIFFTAG_PAGENUMBER, page, pageCount) == 1;
 
             if (!result) {
-                msg::Output(msg::Type::Error, "io::TIFFSetDefaultFields", "Could not set some tiff tags");
+                msg::Print(msg::Type::Error, "io::TIFFSetDefaultFields", "Could not set some tiff tags");
             }
 
             return result;
@@ -38,7 +38,7 @@ namespace ldt::io {
                 // Since libtiff interface does not support const, so use const_cast to remove const
                 // Writing process only reads the value, there is no change
                 if (TIFFWriteScanline(tiff, static_cast<void*>(const_cast<uint32_t*>(raster) + pos), y) != 1) {
-                    msg::Output(msg::Type::Error, "io::WriteImage", "Could not write the image");
+                    msg::Print(msg::Type::Error, "io::WriteImage", "Could not write the image");
                     return false;
                 }
             }
@@ -51,23 +51,24 @@ namespace ldt::io {
                           Pencil* pencil,
                           Orientation orientation) {
             TIFF* const tiff    = tiffPtr.get();
-            const auto dermTiff = OpenDermTIFF(tiff);
+            const auto dermTiff = OpenDermTiff(tiff);
 
             if (TIFFSetDirectory(tiff, page) != 1) {
-                msg::Output(msg::Type::Error, "io::ReadPage", "Could not set the directory");
+                msg::Print(msg::Type::Error, "io::ReadPage", "Could not set the directory");
                 return false;
             }
 
             if (TIFFReadRGBAImageOriented(
                     tiff, dermTiff.width, dermTiff.height, raster, static_cast<int>(orientation), 0)
                 != 1) {
-                msg::Output(msg::Type::Error, "io::ReadPage", "Could not read the image");
+                msg::Print(msg::Type::Error, "io::ReadPage", "Could not read the image");
                 return false;
             }
 
             if (pencil != nullptr) {
                 // Read pencil
-                if (const auto pagename = util::GetFieldOpt<char*>(tiff, TIFFTAG_PAGENAME); pagename.has_value()) {
+                if (const auto pagename = tiff_reader::GetFieldOpt<char*>(tiff, TIFFTAG_PAGENAME);
+                    pagename.has_value()) {
                     if (const auto result = Pencil::Parse(pagename.value()); result.has_value()) {
                         *pencil = result.value();
                     }
@@ -87,7 +88,7 @@ namespace ldt::io {
 
             // check parameters
             if (width > DermTIFF::MaxWidth || height > DermTIFF::MaxHeight) {
-                msg::Output(msg::Type::Error, "io::WriteTIFF", "Too large to write");
+                msg::Print(msg::Type::Error, "io::WriteTIFF", "Too large to write");
                 return false;
             }
             for (uint16_t i = 0; i < layerCount; i++) {
@@ -107,7 +108,7 @@ namespace ldt::io {
                     if (page != 0) {
                         const auto penStr = pencils[page - 1].toString();
                         if (!penStr.has_value() || TIFFSetField(tiff, TIFFTAG_PAGENAME, penStr.value().c_str()) != 1) {
-                            msg::Output(msg::Type::Error, "io::WriteTIFF", "Could not set the pencil name");
+                            msg::Print(msg::Type::Error, "io::WriteTIFF", "Could not set the pencil name");
                             return false;
                         }
                     }
@@ -127,12 +128,12 @@ namespace ldt::io {
     }
 
     EXPORT DermTIFF STDCALL OpenTIFF(const char* filepath) {
-        return OpenDermTIFF(filepath);
+        return OpenDermTiff(filepath);
     }
 
     EXPORT bool STDCALL
     ReadPage(const char* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
+        if (const auto tiffPtr = tiff_reader::OpenTiff(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
 
@@ -154,7 +155,7 @@ namespace ldt::io {
                                   uint32_t height,
                                   const uint32_t* const* const rasters,
                                   const Pencil* const pencils) {
-        if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "w"); tiffPtr) {
+        if (const auto tiffPtr = tiff_reader::OpenTiff(filepath, "w"); tiffPtr) {
             return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
         }
         return false;
@@ -162,12 +163,12 @@ namespace ldt::io {
 
 #ifdef _WIN32
     EXPORT DermTIFF STDCALL OpenTIFFW(const wchar_t* filepath) {
-        return OpenDermTIFF(filepath);
+        return OpenDermTiff(filepath);
     }
 
     EXPORT bool STDCALL
     ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
-        if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "r"); tiffPtr) {
+        if (const auto tiffPtr = tiff_reader::OpenTiffW(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
 
@@ -189,7 +190,7 @@ namespace ldt::io {
                                    uint32_t height,
                                    const uint32_t* const* const rasters,
                                    const Pencil* const pencils) {
-        if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "w"); tiffPtr) {
+        if (const auto tiffPtr = tiff_reader::OpenTiffW(filepath, "w"); tiffPtr) {
             return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
         }
         return false;

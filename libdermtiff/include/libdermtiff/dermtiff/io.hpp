@@ -4,8 +4,9 @@
 #include <optional>
 #include <string>
 
+#include "common.hpp"
+#include "derm_tiff.hpp"
 #include "pencil.hpp"
-#include "type.hpp"
 
 namespace ldt::io {
     enum class Orientation {

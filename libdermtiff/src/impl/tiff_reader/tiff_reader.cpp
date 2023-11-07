@@ -1,12 +1,12 @@
-#include "util.hpp"
+#include "tiff_reader.hpp"
 
 #include <libtiff/tiffio.h>
 
-#include "message_detail.hpp"
+#include "impl/message/message.hpp"
 
-namespace ldt::util {
+namespace ldt::tiff_reader {
     namespace _internal {
-        void SafeTIFFClose(TIFF* const tiff) noexcept {
+        void CloseTiff(TIFF* const tiff) noexcept {
             if (tiff != nullptr) {
                 TIFFClose(tiff);
             }
@@ -24,11 +24,11 @@ namespace ldt::util {
             }
         }
 
-        std::shared_ptr<TIFF> TIFFOpen(TIFF* const tiff) {
+        std::shared_ptr<TIFF> OpenTiff(TIFF* const tiff) {
             if (tiff == nullptr) {
-                msg::Output(msg::Type::Error, "util::SafeTIFFOpen", "Could not open the tiff");
+                msg::Print(msg::Type::Error, "tiff_reader::SafeTIFFOpen", "Could not open the tiff");
             }
-            return std::shared_ptr<TIFF>(tiff, _internal::SafeTIFFClose);
+            return std::shared_ptr<TIFF>(tiff, _internal::CloseTiff);
         }
     }
 
@@ -42,13 +42,13 @@ namespace ldt::util {
         return _internal::GetFieldUInt<uint32_t>(tiff, tag);
     }
 
-    std::shared_ptr<TIFF> SafeTIFFOpen(std::string_view path, const char* mode) noexcept {
-        return _internal::TIFFOpen(TIFFOpen(std::string(path).c_str(), mode));
+    std::shared_ptr<TIFF> OpenTiff(std::string_view path, const char* mode) noexcept {
+        return _internal::OpenTiff(TIFFOpen(std::string(path).c_str(), mode));
     }
 
 #ifdef _WIN32
-    std::shared_ptr<TIFF> SafeTIFFOpenW(std::wstring_view path, const char* mode) noexcept {
-        return _internal::TIFFOpen(TIFFOpenW(std::wstring(path).c_str(), mode));
+    std::shared_ptr<TIFF> OpenTiffW(std::wstring_view path, const char* mode) noexcept {
+        return _internal::OpenTiff(TIFFOpenW(std::wstring(path).c_str(), mode));
     }
 #endif
 }

@@ -8,19 +8,19 @@ if(MSVC)
 endif()
 
 set(DERMTIFF_SOURCES
+    "./src/derm_tiff.cpp"
     "./src/io.cpp"
-    "./src/message.cpp"
     "./src/pencil.cpp"
-    "./src/type.cpp"
-    "./src/util.cpp"
+    "./src/impl/message/message.cpp"
+    "./src/impl/tiff_reader/tiff_reader.cpp"
 )
 
 set(DERMTIFF_HEADERS
     "./include/libdermtiff/dermtiff.hpp"
+    "./include/libdermtiff/dermtiff/common.hpp"
+    "./include/libdermtiff/dermtiff/derm_tiff.hpp"
     "./include/libdermtiff/dermtiff/io.hpp"
-    "./include/libdermtiff/dermtiff/message.hpp"
     "./include/libdermtiff/dermtiff/pencil.hpp"
-    "./include/libdermtiff/dermtiff/type.hpp"
 )
 
 add_library(dermtiff ${DERMTIFF_SOURCES})
@@ -30,6 +30,7 @@ target_include_directories(dermtiff
     "../deps/libtiff/"
     "../build/deps/libtiff/libtiff/"
     "./include/libdermtiff/dermtiff/"
+    "./src/"
 )
 
 target_link_libraries(dermtiff PRIVATE tiff)

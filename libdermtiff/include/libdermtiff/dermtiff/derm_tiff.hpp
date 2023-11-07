@@ -3,9 +3,6 @@
 #include <cstdint>
 #include <string>
 
-#define EXPORT extern "C" __declspec(dllexport)
-#define STDCALL __stdcall
-
 typedef struct tiff TIFF;
 
 namespace ldt {
@@ -36,11 +33,11 @@ namespace ldt {
         uint32_t subFileType;
     };
 
-    DermTIFF OpenDermTIFF(TIFF* const tiff);
+    DermTIFF OpenDermTiff(TIFF* const tiff);
 
-    DermTIFF OpenDermTIFF(std::string_view path);
+    DermTIFF OpenDermTiff(std::string_view path);
 
 #ifdef _WIN32
-    DermTIFF OpenDermTIFF(std::wstring_view path);
+    DermTIFF OpenDermTiff(std::wstring_view path);
 #endif
 }
