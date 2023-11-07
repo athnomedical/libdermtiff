@@ -1,9 +1,15 @@
-#include "pencil.hpp"
+#include "dermtiff/pencil.hpp"
 
 #include <iostream>
 #include <sstream>
 
-#include "message_detail.hpp"
+#include "impl/message/message.hpp"
+
+#if _WIN32
+#define STRCPY strcpy_s
+#else
+#define STRCPY strcpy
+#endif
 
 namespace ldt {
     namespace _internal {
@@ -48,18 +54,18 @@ namespace ldt {
 
         const auto index = str.find('/');
         if (index == std::string::npos) {
-            msg::Output(msg::Type::Error, "Pencil::Parse", "No separator in string");
+            msg::Print(msg::Type::Error, "Pencil::Parse", "No separator in string");
             return std::nullopt;
         }
 
         std::string pencilName = std::string(str.substr(0, index));
         _internal::trimSpaces(pencilName);
         if (pencilName.empty()) {
-            msg::Output(msg::Type::Error, "Pencil::Parse", "Empty pencil name");
+            msg::Print(msg::Type::Error, "Pencil::Parse", "Empty pencil name");
             return std::nullopt;
         }
 
-        strcpy(pencil.name, pencilName.c_str());
+        STRCPY(pencil.name, pencilName.c_str());
 
         try {
             std::string colorString = std::string(str.substr(index + 1, str.length() - index));
@@ -84,13 +90,13 @@ namespace ldt {
             }
 
             if (count != 4) {
-                msg::Output(msg::Type::Error, "Pencil::Parse", "Invalid pencil color");
+                msg::Print(msg::Type::Error, "Pencil::Parse", "Invalid pencil color");
                 return std::nullopt;
             }
 
             return pencil;
         } catch (const std::exception& e) {
-            msg::Output(msg::Type::Error, "Pencil::Parse", std::string(e.what()));
+            msg::Print(msg::Type::Error, "Pencil::Parse", std::string(e.what()));
             return std::nullopt;
         }
     }
@@ -99,11 +105,11 @@ namespace ldt {
         const bool isValidLength = _name.length() <= MaxNameLength;
 
         if (isValidLength) {
-            strcpy(name, _name.data());
+            STRCPY(name, _name.data());
         } else {
             const auto str = std::string(_name.substr(0, MaxNameLength)) + '\0';
-            strcpy(name, str.data());
-            msg::Output(msg::Type::Warning, "Pencil::setName", "Name length exceeds the limit");
+            STRCPY(name, str.data());
+            msg::Print(msg::Type::Warning, "Pencil::setName", "Name length exceeds the limit");
         }
 
         return isValidLength;
@@ -111,7 +117,7 @@ namespace ldt {
 
     std::optional<std::string> Pencil::toString() const {
         if (std::string(name).empty()) {
-            msg::Output(msg::Type::Error, "Pencil::toString", "Empty pencil name");
+            msg::Print(msg::Type::Error, "Pencil::toString", "Empty pencil name");
             return std::nullopt;
         }
 

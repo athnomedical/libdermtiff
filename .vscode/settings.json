@@ -10,4 +10,7 @@
     "[cpp]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },
+    "search.exclude": {
+        "deps": true
+    }
 }

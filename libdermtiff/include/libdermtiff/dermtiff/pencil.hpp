@@ -10,7 +10,10 @@ namespace ldt {
         static const uint8_t MaxNameLength = 64;
 
         char name[MaxNameLength + 1] = "\0";
-        uint8_t r = 0, g = 0, b = 0, a = 255;
+        uint8_t r                    = 0;
+        uint8_t g                    = 0;
+        uint8_t b                    = 0;
+        uint8_t a                    = 255;
 
         Pencil() = default;
 
