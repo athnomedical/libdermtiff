@@ -5,6 +5,12 @@
 
 #include "message_detail.hpp"
 
+#if _WIN32
+#define STRCPY strcpy_s
+#else
+#define STRCPY strcpy
+#endif
+
 namespace ldt {
     namespace _internal {
         void ltrim(std::string& str, const std::string& trimChars) {
@@ -59,7 +65,7 @@ namespace ldt {
             return std::nullopt;
         }
 
-        strcpy(pencil.name, pencilName.c_str());
+        STRCPY(pencil.name, pencilName.c_str());
 
         try {
             std::string colorString = std::string(str.substr(index + 1, str.length() - index));
@@ -99,10 +105,10 @@ namespace ldt {
         const bool isValidLength = _name.length() <= MaxNameLength;
 
         if (isValidLength) {
-            strcpy(name, _name.data());
+            STRCPY(name, _name.data());
         } else {
             const auto str = std::string(_name.substr(0, MaxNameLength)) + '\0';
-            strcpy(name, str.data());
+            STRCPY(name, str.data());
             msg::Output(msg::Type::Warning, "Pencil::setName", "Name length exceeds the limit");
         }
 
