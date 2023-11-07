@@ -8,6 +8,7 @@ if(MSVC)
 endif()
 
 set(DERMTIFF_SOURCES
+    "./src/common.cpp"
     "./src/derm_tiff.cpp"
     "./src/io.cpp"
     "./src/pencil.cpp"
