@@ -9,6 +9,4 @@
 
 namespace ldt {
     EXPORT const char* STDCALL GetVersion();
-
-    EXPORT const char* STDCALL GetVersionNum();
 }
