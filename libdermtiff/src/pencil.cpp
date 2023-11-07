@@ -1,4 +1,4 @@
-#include "dermtiff/pencil.hpp"
+#include "pencil.hpp"
 
 #include <iostream>
 #include <sstream>

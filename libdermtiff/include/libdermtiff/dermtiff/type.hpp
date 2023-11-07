@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <string>
 
+#define EXPORT extern "C" __declspec(dllexport)
+#define STDCALL __stdcall
+
 typedef struct tiff TIFF;
 
 namespace ldt {

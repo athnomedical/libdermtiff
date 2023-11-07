@@ -1,4 +1,4 @@
-#include "dermtiff/message.hpp"
+#include "message.hpp"
 
 #include <iostream>
 
@@ -23,7 +23,7 @@ namespace ldt::msg {
     bool stdErrWhenNoCallback = true;
     std::function<void(Type, std::string_view)> callback;
 
-    void SetStdErrWhenNoCallback(bool enable) {
+    EXPORT void STDCALL SetStdErrWhenNoCallback(bool enable) {
         stdErrWhenNoCallback = enable;
     }
 
@@ -37,11 +37,11 @@ namespace ldt::msg {
         }
     }
 
-    void RegisterCallback(const std::function<void(Type, std::string_view)>& _callback) {
+    EXPORT void STDCALL RegisterCallback(const std::function<void(Type, std::string_view)>& _callback) {
         callback = _callback;
     }
 
-    void RemoveCallback() {
+    EXPORT void STDCALL RemoveCallback() {
         callback = std::function<void(Type, std::string_view)>();
     }
 }

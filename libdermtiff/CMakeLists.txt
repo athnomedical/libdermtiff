@@ -8,7 +8,6 @@ if(MSVC)
 endif()
 
 set(DERMTIFF_SOURCES
-    "./src/dermtiff.cpp"
     "./src/io.cpp"
     "./src/message.cpp"
     "./src/pencil.cpp"
@@ -30,7 +29,7 @@ target_include_directories(dermtiff
     PRIVATE
     "../deps/libtiff/"
     "../build/deps/libtiff/libtiff/"
-    "./include/libdermtiff/"
+    "./include/libdermtiff/dermtiff/"
 )
 
 target_link_libraries(dermtiff PRIVATE tiff)

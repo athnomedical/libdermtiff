@@ -1,4 +1,4 @@
-#include "dermtiff/io.hpp"
+#include "io.hpp"
 
 #include <libtiff/tiffio.h>
 
@@ -126,11 +126,12 @@ namespace ldt::io {
         }
     }
 
-    DermTIFF OpenTIFF(const char* filepath) {
+    EXPORT DermTIFF STDCALL OpenTIFF(const char* filepath) {
         return DermTIFF(filepath);
     }
 
-    bool ReadPage(const char* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+    EXPORT bool STDCALL
+    ReadPage(const char* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
@@ -138,21 +139,21 @@ namespace ldt::io {
         return false;
     }
 
-    bool ReadOriginalImage(const char* filepath, uint32_t* raster, Orientation orientation) {
+    EXPORT bool STDCALL ReadOriginalImage(const char* filepath, uint32_t* raster, Orientation orientation) {
         return ReadPage(filepath, 0, &*raster, nullptr, orientation);
     }
 
-    bool ReadLayer(
-        const char* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+    EXPORT bool STDCALL
+    ReadLayer(const char* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         return ReadPage(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
     }
 
-    bool WriteTIFF(const char* filepath,
-                   uint16_t layerCount,
-                   uint32_t width,
-                   uint32_t height,
-                   const uint32_t* const* const rasters,
-                   const Pencil* const pencils) {
+    EXPORT bool STDCALL WriteTIFF(const char* filepath,
+                                  uint16_t layerCount,
+                                  uint32_t width,
+                                  uint32_t height,
+                                  const uint32_t* const* const rasters,
+                                  const Pencil* const pencils) {
         if (const auto tiffPtr = util::SafeTIFFOpen(filepath, "w"); tiffPtr) {
             return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
         }
@@ -160,11 +161,12 @@ namespace ldt::io {
     }
 
 #ifdef _WIN32
-    DermTIFF OpenTIFFW(const wchar_t* filepath) {
+    EXPORT DermTIFF STDCALL OpenTIFFW(const wchar_t* filepath) {
         return DermTIFF(filepath);
     }
 
-    bool ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
+    EXPORT bool STDCALL
+    ReadPageW(const wchar_t* filepath, uint16_t page, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "r"); tiffPtr) {
             return _internal::ReadPageImpl(tiffPtr, page, &*raster, &*pencil, orientation);
         }
@@ -172,21 +174,21 @@ namespace ldt::io {
         return false;
     }
 
-    bool ReadOriginalImageW(const wchar_t* filepath, uint32_t* raster, Orientation orientation) {
+    EXPORT bool STDCALL ReadOriginalImageW(const wchar_t* filepath, uint32_t* raster, Orientation orientation) {
         return ReadPageW(filepath, 0, &*raster, nullptr, orientation);
     }
 
-    bool ReadLayerW(
+    EXPORT bool STDCALL ReadLayerW(
         const wchar_t* filepath, uint16_t layerIndex, uint32_t* raster, Pencil* pencil, Orientation orientation) {
         return ReadPageW(filepath, layerIndex + 1, &*raster, &*pencil, orientation);
     }
 
-    bool WriteTIFFW(const wchar_t* filepath,
-                    uint16_t layerCount,
-                    uint32_t width,
-                    uint32_t height,
-                    const uint32_t* const* const rasters,
-                    const Pencil* const pencils) {
+    EXPORT bool STDCALL WriteTIFFW(const wchar_t* filepath,
+                                   uint16_t layerCount,
+                                   uint32_t width,
+                                   uint32_t height,
+                                   const uint32_t* const* const rasters,
+                                   const Pencil* const pencils) {
         if (const auto tiffPtr = util::SafeTIFFOpenW(filepath, "w"); tiffPtr) {
             return _internal::WriteTIFFImpl(tiffPtr, layerCount, width, height, &*rasters, &*pencils);
         }
