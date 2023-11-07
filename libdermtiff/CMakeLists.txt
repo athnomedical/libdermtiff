@@ -8,6 +8,7 @@ if(MSVC)
 endif()
 
 set(DERMTIFF_SOURCES
+    "./src/dermtiff.cpp"
     "./src/io.cpp"
     "./src/message.cpp"
     "./src/pencil.cpp"
@@ -23,21 +24,13 @@ set(DERMTIFF_HEADERS
     "./include/libdermtiff/dermtiff/type.hpp"
 )
 
-if(WIN32)
-    set(
-        DERMTIFF_SOURCES
-        ${DERMTIFF_SOURCES}
-        dermtiff.def
-    )
-endif()
-
 add_library(dermtiff ${DERMTIFF_SOURCES})
 
 target_include_directories(dermtiff
     PRIVATE
     "../deps/libtiff/"
     "../build/deps/libtiff/libtiff/"
-    "./include/libdermtiff/dermtiff/"
+    "./include/libdermtiff/"
 )
 
 target_link_libraries(dermtiff PRIVATE tiff)

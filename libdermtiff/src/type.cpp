@@ -1,4 +1,4 @@
-#include "type.hpp"
+#include "dermtiff/type.hpp"
 
 #include <libtiff/tiffio.h>
 
