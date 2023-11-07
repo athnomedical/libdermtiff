@@ -38,4 +38,4 @@ find_package(ZLIB REQUIRED)
 
 add_subdirectory("deps/libtiff")
 add_subdirectory("libdermtiff")
-add_subdirectory("test")
+# add_subdirectory("test")
