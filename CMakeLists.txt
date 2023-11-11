@@ -15,7 +15,7 @@ set(CMAKE_PROJECT_VERSION_PATCH 1)
 if (MSVC)
 	set(CMAKE_CXX_FLAGS "/W4 /EHsc")
 else()
-	set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas")
+	set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -Wno-dev")
 endif()
 
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
@@ -35,6 +35,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
 
 find_package(ZLIB REQUIRED)
+
+set(tiff-tools OFF)
+set(tiff-tests OFF)
+set(tiff-contrib OFF)
+set(tiff-docs OFF)
 
 add_subdirectory("deps/libtiff")
 add_subdirectory("libdermtiff")
