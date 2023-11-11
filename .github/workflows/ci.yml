@@ -60,7 +60,7 @@ jobs:
           mkdir -p build
           cd build
           cmake -GNinja ..
-          mv deps/libtiff/VERSION deps/libtiff/VERSION.txt
+          mv ../deps/libtiff/VERSION ../deps/libtiff/VERSION.txt
 
       - name: Build
         run: |
