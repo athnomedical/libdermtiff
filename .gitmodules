@@ -3,4 +3,4 @@
 	url = https://gitlab.com/libtiff/libtiff.git
 [submodule "deps/zlib"]
 	path = deps/zlib
-	url = git@github.com:madler/zlib.git
+	url = https://github.com/madler/zlib.git

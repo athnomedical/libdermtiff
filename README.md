@@ -7,7 +7,7 @@ This requires C++17 or later.
 ## Setup
 
 ```
-git submodule update
+git submodule update --init
 ```
 
 ```powershell
