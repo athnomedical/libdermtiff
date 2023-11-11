@@ -37,7 +37,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
 find_package(ZLIB REQUIRED)
 
 option(tiff-tools "build TIFF tools" OFF)
-option(tiff-tests "build TIFF tests" OFF)
+option(tiff-tests "build TIFF tests" ON)
 option(tiff-contrib "build TIFF contrib" OFF)
 option(tiff-docs "build TIFF documentation" OFF)
 
