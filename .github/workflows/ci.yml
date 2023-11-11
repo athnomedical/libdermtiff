@@ -5,11 +5,13 @@ on:
     branches:
       - main
       - develop
+      - flutter-ffi
 
   pull_request:
     branches:
       - main
       - develop
+      - flutter-ffi
 
 jobs:
   windows:
