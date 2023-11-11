@@ -41,6 +41,18 @@ option(tiff-tests "build TIFF tests" OFF)
 option(tiff-contrib "build TIFF contrib" OFF)
 option(tiff-docs "build TIFF documentation" OFF)
 
+if (APPLE)
+	set(VERSION_FILE_BEFORE ${PROJECT_SOURCE_DIR}/deps/libtiff/VERSION)
+	set(VERSION_FILE_AFTER ${PROJECT_SOURCE_DIR}/deps/libtiff/VERSION.txt)
+	if(EXISTS ${VERSION_FILE_AFTER})
+		execute_process(COMMAND "mv ${VERSION_FILE_BEFORE} ${VERSION_FILE_AFTER}")
+	endif()
+endif()
+
 add_subdirectory("deps/libtiff")
 add_subdirectory("libdermtiff")
 add_subdirectory("test")
+
+if (APPLE)
+	execute_process(COMMAND "mv ${VERSION_FILE_AFTER} ${VERSION_FILE_BEFORE}")
+endif()
