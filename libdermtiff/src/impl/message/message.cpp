@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace ldt::msg {
-    namespace _internal {
+    namespace internal {
         std::string type_to_str(Type type) {
             switch (type) {
             case Type::Info:
@@ -18,9 +18,9 @@ namespace ldt::msg {
         }
     }
 
-    void Print(Type type, std::string_view funcName, std::string_view message) {
+    void print(Type type, std::string_view funcName, std::string_view message) {
         // ex. libdermtiff[Error](FuncName) Could not read page
-        std::cerr << "libdermtiff[" << _internal::type_to_str(type) << "]"
+        std::cerr << "libdermtiff[" << internal::type_to_str(type) << "]"
                   << "(" << funcName << ") " << message << std::endl;
     }
 }

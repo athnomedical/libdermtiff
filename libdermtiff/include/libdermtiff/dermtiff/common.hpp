@@ -13,5 +13,5 @@
 #endif
 
 namespace ldt {
-    EXPORT const char* STDCALL GetVersion();
+    EXPORT const char* STDCALL get_version();
 }

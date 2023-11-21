@@ -12,66 +12,66 @@
 #endif
 
 namespace ldt {
-    namespace _internal {
-        void ltrim(std::string& str, const std::string& trimChars) {
-            if (!str.empty()) {
-                const size_t pos = str.find_first_not_of(trimChars);
-                str              = str.substr(pos, str.length() - pos);
+    namespace internal {
+        void ltrim(std::string& target, const std::string& str) {
+            if (!target.empty()) {
+                const size_t pos = target.find_first_not_of(str);
+                target           = target.substr(pos, target.length() - pos);
             }
         }
 
-        void rtrim(std::string& str, const std::string& trimChars) {
-            if (!str.empty()) {
-                const size_t pos = str.find_last_not_of(trimChars);
-                str              = str.substr(0, pos + 1);
+        void rtrim(std::string& target, const std::string& str) {
+            if (!target.empty()) {
+                const size_t pos = target.find_last_not_of(str);
+                target           = target.substr(0, pos + 1);
             }
         }
 
-        void trim(std::string& str, const std::string& trimChars) {
-            _internal::ltrim(str, trimChars);
-            _internal::rtrim(str, trimChars);
+        void trim(std::string& target, const std::string& str) {
+            internal::ltrim(target, str);
+            internal::rtrim(target, str);
         }
 
-        void trimSpaces(std::string& str) {
-            _internal::trim(str, " 　");  // Half-width space and full-width space
+        void trim_spaces(std::string& target) {
+            internal::trim(target, " 　");  // Half-width space and full-width space
         }
     }
 
     Pencil::Pencil(std::string_view _name) {
-        setName(_name);
+        set_name(_name);
     }
 
     Pencil::Pencil(std::string_view _name, uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a) {
-        setName(_name);
+        set_name(_name);
         r = _r;
         g = _g;
         b = _b;
         a = _a;
     }
 
-    std::optional<Pencil> Pencil::Parse(std::string_view str) {
+    std::optional<Pencil> Pencil::parse(std::string_view str) {
         Pencil pencil;
 
         const auto index = str.find('/');
         if (index == std::string::npos) {
-            msg::Print(msg::Type::Error, "Pencil::Parse", "No separator in string");
+            msg::print(msg::Type::Error, "Pencil::parse", "No separator in string");
             return std::nullopt;
         }
 
-        std::string pencilName = std::string(str.substr(0, index));
-        _internal::trimSpaces(pencilName);
-        if (pencilName.empty()) {
-            msg::Print(msg::Type::Error, "Pencil::Parse", "Empty pencil name");
+        std::string pencil_name = std::string(str.substr(0, index));
+        internal::trim_spaces(pencil_name);
+        if (pencil_name.empty()) {
+            msg::print(msg::Type::Error, "Pencil::parse", "Empty pencil name");
             return std::nullopt;
         }
 
-        STRCPY(pencil.name, pencilName.c_str());
+        STRCPY(pencil.name, pencil_name.c_str());
 
         try {
-            std::string colorString = std::string(str.substr(index + 1, str.length() - index));
-            _internal::trimSpaces(colorString);
-            _internal::trim(colorString, "()");
-            std::stringstream stream{colorString};
+            std::string color_string = std::string(str.substr(index + 1, str.length() - index));
+            internal::trim_spaces(color_string);
+            internal::trim(color_string, "()");
+            std::stringstream stream{color_string};
             std::string buf;
             size_t count = 0;
             while (std::getline(stream, buf, ',')) {
@@ -90,34 +90,34 @@ namespace ldt {
             }
 
             if (count != 4) {
-                msg::Print(msg::Type::Error, "Pencil::Parse", "Invalid pencil color");
+                msg::print(msg::Type::Error, "Pencil::parse", "Invalid pencil color");
                 return std::nullopt;
             }
 
             return pencil;
         } catch (const std::exception& e) {
-            msg::Print(msg::Type::Error, "Pencil::Parse", std::string(e.what()));
+            msg::print(msg::Type::Error, "Pencil::parse", std::string(e.what()));
             return std::nullopt;
         }
     }
 
-    bool Pencil::setName(std::string_view _name) {
-        const bool isValidLength = _name.length() <= MaxNameLength;
+    bool Pencil::set_name(std::string_view _name) {
+        const bool is_valid_length = _name.length() <= max_name_length;
 
-        if (isValidLength) {
+        if (is_valid_length) {
             STRCPY(name, _name.data());
         } else {
-            const auto str = std::string(_name.substr(0, MaxNameLength)) + '\0';
+            const auto str = std::string(_name.substr(0, max_name_length)) + '\0';
             STRCPY(name, str.data());
-            msg::Print(msg::Type::Warning, "Pencil::setName", "Name length exceeds the limit");
+            msg::print(msg::Type::Warning, "Pencil::set_name", "Name length exceeds the limit");
         }
 
-        return isValidLength;
+        return is_valid_length;
     }
 
-    std::optional<std::string> Pencil::toString() const {
+    std::optional<std::string> Pencil::to_string() const {
         if (std::string(name).empty()) {
-            msg::Print(msg::Type::Error, "Pencil::toString", "Empty pencil name");
+            msg::print(msg::Type::Error, "Pencil::to_string", "Empty pencil name");
             return std::nullopt;
         }
 

@@ -5,15 +5,15 @@
 #include "impl/message/message.hpp"
 
 namespace ldt::tiff_util {
-    namespace _internal {
-        void CloseTiff(TIFF* const tiff) noexcept {
+    namespace internal {
+        void close_tiff(TIFF* const tiff) noexcept {
             if (tiff != nullptr) {
                 TIFFClose(tiff);
             }
         }
 
         template <typename T>
-        T GetFieldUInt(TIFF* const tiff, uint32_t tag) noexcept {
+        T get_field_uint(TIFF* const tiff, uint32_t tag) noexcept {
             static_assert(std::is_unsigned<T>::value);
             if (tiff == nullptr) {
                 return 0;
@@ -24,31 +24,31 @@ namespace ldt::tiff_util {
             }
         }
 
-        std::shared_ptr<TIFF> OpenTiff(TIFF* const tiff) {
+        std::shared_ptr<TIFF> open_tiff(TIFF* const tiff) {
             if (tiff == nullptr) {
-                msg::Print(msg::Type::Error, "tiff_util::SafeTIFFOpen", "Could not open the tiff");
+                msg::print(msg::Type::Error, "tiff_util::safe_tiff_open", "Could not open the tiff");
             }
-            return std::shared_ptr<TIFF>(tiff, _internal::CloseTiff);
+            return std::shared_ptr<TIFF>(tiff, internal::close_tiff);
         }
     }
 
     template <>
-    uint16_t GetField(TIFF* const tiff, uint32_t tag) noexcept {
-        return _internal::GetFieldUInt<uint16_t>(tiff, tag);
+    uint16_t get_field(TIFF* const tiff, uint32_t tag) noexcept {
+        return internal::get_field_uint<uint16_t>(tiff, tag);
     }
 
     template <>
-    uint32_t GetField(TIFF* const tiff, uint32_t tag) noexcept {
-        return _internal::GetFieldUInt<uint32_t>(tiff, tag);
+    uint32_t get_field(TIFF* const tiff, uint32_t tag) noexcept {
+        return internal::get_field_uint<uint32_t>(tiff, tag);
     }
 
-    std::shared_ptr<TIFF> OpenTiff(std::string_view path, const char* mode) noexcept {
-        return _internal::OpenTiff(TIFFOpen(std::string(path).c_str(), mode));
+    std::shared_ptr<TIFF> open_tiff(std::string_view path, const char* mode) noexcept {
+        return internal::open_tiff(TIFFOpen(std::string(path).c_str(), mode));
     }
 
 #ifdef _WIN32
-    std::shared_ptr<TIFF> OpenTiffW(std::wstring_view path, const char* mode) noexcept {
-        return _internal::OpenTiff(TIFFOpenW(std::wstring(path).c_str(), mode));
+    std::shared_ptr<TIFF> open_tiff_w(std::wstring_view path, const char* mode) noexcept {
+        return internal::open_tiff(TIFFOpenW(std::wstring(path).c_str(), mode));
     }
 #endif
 }

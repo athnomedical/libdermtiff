@@ -13,48 +13,48 @@
     {                                                                                                                  \
         bool valid = true;                                                                                             \
         process;                                                                                                       \
-        isValid &= valid;                                                                                              \
+        is_valid &= valid;                                                                                             \
         if (!valid) {                                                                                                  \
-            msg::Print(msg::Type::Error, "DermTIFF::Validate", errorMessage);                                          \
+            msg::print(msg::Type::Error, "DermTIFF::validate_tiff", errorMessage);                                     \
         }                                                                                                              \
     }
 
 namespace ldt {
-    namespace _internal {
-        bool Validate(const DermTIFF& dermTiff, TIFF* const tiff) {
-            if (tiff == nullptr || dermTiff.pageCount == 0) {
+    namespace internal {
+        bool validate_tiff(const DermTIFF& derm_tiff, TIFF* const tiff) {
+            if (tiff == nullptr || derm_tiff.page_count == 0) {
                 return false;
             }
 
-            bool isValid = true;
+            bool is_valid = true;
 
             // image size is the same on all pages
             ValidateDetail("All of image size of pages should be the same", {
-                for (uint16_t i = 0; i < dermTiff.pageCount; i++) {
+                for (uint16_t i = 0; i < derm_tiff.page_count; i++) {
                     TIFFReadDirectory(tiff);
-                    valid &= dermTiff.width == tiff_util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
-                    valid &= dermTiff.height == tiff_util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
+                    valid &= derm_tiff.width == tiff_util::get_field<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
+                    valid &= derm_tiff.height == tiff_util::get_field<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
                 }
                 TIFFSetDirectory(tiff, 0);
             });
 
             // limitation of image width and height
-            ValidateDetail(ss.str(), valid &= 0 < dermTiff.width && 0 < dermTiff.height;
-                           valid &= dermTiff.width <= DermTIFF::MaxWidth && dermTiff.height <= DermTIFF::MaxHeight;
+            ValidateDetail(ss.str(), valid &= 0 < derm_tiff.width && 0 < derm_tiff.height;
+                           valid &= derm_tiff.width <= DermTIFF::max_width && derm_tiff.height <= DermTIFF::max_height;
                            std::stringstream ss;
-                           ss << "Image size " << dermTiff.width << "x" << dermTiff.height << " exceeds the limit "
-                              << DermTIFF::MaxWidth << "x" << DermTIFF::MaxHeight;);
+                           ss << "Image size " << derm_tiff.width << "x" << derm_tiff.height << " exceeds the limit "
+                              << DermTIFF::max_width << "x" << DermTIFF::max_height;);
 
             // compression support
-            ValidateDetail(ss.str(), const auto compression = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
+            ValidateDetail(ss.str(), const auto compression = tiff_util::get_field<uint16_t>(tiff, TIFFTAG_COMPRESSION);
                            valid &= TIFFIsCODECConfigured(compression) == 1;
                            std::stringstream ss;
                            ss << "The compression " << compression << " is not supported";);
 
-            return isValid;
+            return is_valid;
         }
 
-        uint16_t SafeTIFFGetValue(TIFF* const tiff, const std::function<uint16_t(TIFF*)>& func) {
+        uint16_t safe_tiff_get_value(TIFF* const tiff, const std::function<uint16_t(TIFF*)>& func) {
             if (tiff == nullptr) {
                 return 0;
             } else {
@@ -62,13 +62,13 @@ namespace ldt {
             }
         }
 
-        uint16_t GetExtraSamples(TIFF* const tiff) {
+        uint16_t get_extra_samples(TIFF* const tiff) {
             if (tiff == nullptr) {
                 return 0;
             }
 
-            uint16_t count    = 0;
-            auto extraSamples = std::make_unique<uint16_t*>();
+            uint16_t count          = 0;
+            const auto extraSamples = std::make_unique<uint16_t*>();
 
             if (TIFFGetField(tiff, TIFFTAG_EXTRASAMPLES, &count, extraSamples.get()) == 1) {
                 uint16_t result = 0;
@@ -82,31 +82,31 @@ namespace ldt {
         }
     }
 
-    DermTIFF OpenDermTiff(TIFF* const tiff) {
-        DermTIFF dermTiff;
-        dermTiff.pageCount       = _internal::SafeTIFFGetValue(tiff, TIFFNumberOfDirectories);
-        dermTiff.layerCount      = dermTiff.pageCount - 1;
-        dermTiff.width           = tiff_util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
-        dermTiff.height          = tiff_util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
-        dermTiff.bitsPerSample   = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE);
-        dermTiff.compression     = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
-        dermTiff.extraSamples    = _internal::GetExtraSamples(tiff);
-        dermTiff.photometric     = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC);
-        dermTiff.planarConfig    = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_PLANARCONFIG);
-        dermTiff.samplesPerPixel = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL);
-        dermTiff.subFileType     = tiff_util::GetField<uint32_t>(tiff, TIFFTAG_SUBFILETYPE);
-        dermTiff.isValid         = _internal::Validate(dermTiff, tiff);
+    DermTIFF open_derm_tiff(TIFF* const tiff) {
+        DermTIFF derm_tiff;
+        derm_tiff.page_count        = internal::safe_tiff_get_value(tiff, TIFFNumberOfDirectories);
+        derm_tiff.layer_count       = derm_tiff.page_count - 1;
+        derm_tiff.width             = tiff_util::get_field<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
+        derm_tiff.height            = tiff_util::get_field<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
+        derm_tiff.bits_per_sample   = tiff_util::get_field<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE);
+        derm_tiff.compression       = tiff_util::get_field<uint16_t>(tiff, TIFFTAG_COMPRESSION);
+        derm_tiff.extra_samples     = internal::get_extra_samples(tiff);
+        derm_tiff.photometric       = tiff_util::get_field<uint16_t>(tiff, TIFFTAG_PHOTOMETRIC);
+        derm_tiff.planar_config     = tiff_util::get_field<uint16_t>(tiff, TIFFTAG_PLANARCONFIG);
+        derm_tiff.samples_per_pixel = tiff_util::get_field<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL);
+        derm_tiff.sub_file_type     = tiff_util::get_field<uint32_t>(tiff, TIFFTAG_SUBFILETYPE);
+        derm_tiff.is_valid          = internal::validate_tiff(derm_tiff, tiff);
 
-        return dermTiff;
+        return derm_tiff;
     }
 
-    DermTIFF OpenDermTiff(std::string_view path) {
-        return OpenDermTiff(tiff_util::OpenTiff(path, "r").get());
+    DermTIFF open_derm_tiff(std::string_view path) {
+        return open_derm_tiff(tiff_util::open_tiff(path, "r").get());
     }
 
 #ifdef _WIN32
-    DermTIFF OpenDermTiff(std::wstring_view path) {
-        return OpenDermTiff(tiff_util::OpenTiffW(path, "r").get());
+    DermTIFF open_derm_tiff(std::wstring_view path) {
+        return open_derm_tiff(tiff_util::open_tiff_w(path, "r").get());
     }
 #endif
 }

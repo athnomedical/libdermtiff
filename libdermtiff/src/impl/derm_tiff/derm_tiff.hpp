@@ -5,11 +5,11 @@
 #include "dermtiff/derm_tiff.hpp"
 
 namespace ldt {
-    DermTIFF OpenDermTiff(TIFF* const tiff);
+    DermTIFF open_derm_tiff(TIFF* const tiff);
 
-    DermTIFF OpenDermTiff(std::string_view path);
+    DermTIFF open_derm_tiff(std::string_view path);
 
 #ifdef _WIN32
-    DermTIFF OpenDermTiff(std::wstring_view path);
+    DermTIFF open_derm_tiff(std::wstring_view path);
 #endif
 }
