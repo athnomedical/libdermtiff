@@ -10,9 +10,10 @@ namespace ldt {
     struct DermTIFF {
         static constexpr uint32_t MaxWidth = 16384, MaxHeight = 16384;
 
+        bool isValid;
+
         uint16_t pageCount, layerCount;
         uint32_t width, height;
-        bool isOpened, isValid;
         uint16_t bitsPerSample;
         uint16_t compression;
 

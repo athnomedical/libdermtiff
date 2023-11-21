@@ -88,8 +88,6 @@ namespace ldt {
         dermTiff.layerCount      = dermTiff.pageCount - 1;
         dermTiff.width           = tiff_util::GetField<uint32_t>(tiff, TIFFTAG_IMAGEWIDTH);
         dermTiff.height          = tiff_util::GetField<uint32_t>(tiff, TIFFTAG_IMAGELENGTH);
-        dermTiff.isOpened        = tiff != nullptr;
-        dermTiff.isValid         = _internal::Validate(dermTiff, tiff);
         dermTiff.bitsPerSample   = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_BITSPERSAMPLE);
         dermTiff.compression     = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_COMPRESSION);
         dermTiff.extraSamples    = _internal::GetExtraSamples(tiff);
@@ -97,6 +95,7 @@ namespace ldt {
         dermTiff.planarConfig    = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_PLANARCONFIG);
         dermTiff.samplesPerPixel = tiff_util::GetField<uint16_t>(tiff, TIFFTAG_SAMPLESPERPIXEL);
         dermTiff.subFileType     = tiff_util::GetField<uint32_t>(tiff, TIFFTAG_SUBFILETYPE);
+        dermTiff.isValid         = _internal::Validate(dermTiff, tiff);
 
         return dermTiff;
     }
