@@ -70,36 +70,6 @@ jobs:
           cd build
           ctest -C debug --test-dir test/
 
-  macOS_M1:
-    name: CI for M1 macOS
-    runs-on: macos-latest-xl
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-
-      - name: Setup
-        run: zsh scripts/macos/setup.sh
-
-      - name: Install Ninja
-        run: brew install ninja
-
-      - name: Configure
-        run: |
-          mkdir -p build
-          cd build
-          cmake -GNinja ..
-
-      - name: Build
-        run: |
-          cd build
-          ninja
-
-      - name: Test
-        run: |
-          cd build
-          ctest -C debug --test-dir test/
-
   linux:
     name: CI for Linux
     runs-on: ubuntu-20.04
