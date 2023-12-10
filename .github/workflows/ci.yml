@@ -72,7 +72,7 @@ jobs:
 
   macOS_M1:
     name: CI for M1 macOS
-    runs-on: macos-latest-xlarge
+    runs-on: macos-latest-xl
     steps:
       - uses: actions/checkout@v2
         with:
