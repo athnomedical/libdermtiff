@@ -70,7 +70,7 @@ jobs:
           cd build
           ctest -C debug --test-dir test/
 
-  macOS:
+  macOS_M1:
     name: CI for M1 macOS
     runs-on: macos-latest-xlarge
     steps:
