@@ -7,6 +7,5 @@ macro(add_template_test name file)
 endmacro()
 
 add_template_test(dermtiff-pencil "pencil.cpp")
-add_template_test(dermtiff-tiff-read "tiffRead.cpp")
-add_template_test(dermtiff-tiff-write "tiffWrite.cpp")
-add_template_test(dermtiff-message "message.cpp")
+add_template_test(dermtiff-tiff-read "tiff_read.cpp")
+add_template_test(dermtiff-tiff-write "tiff_write.cpp")

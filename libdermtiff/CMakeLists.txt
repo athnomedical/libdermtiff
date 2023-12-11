@@ -7,20 +7,44 @@ if(MSVC)
     endif()
 endif()
 
-include_directories(
-    "../deps/libtiff/"
-    "../build/deps/libtiff/libtiff/"
-    "./include/libdermtiff/dermtiff/"
+set(DERMTIFF_SOURCES
+    "./src/common.cpp"
+    "./src/io.cpp"
+    "./src/pencil.cpp"
+    "./src/impl/derm_tiff/derm_tiff.cpp"
+    "./src/impl/message/message.cpp"
+    "./src/impl/tiff_util/tiff_util.cpp"
 )
 
-add_library(dermtiff)
+set(DERMTIFF_HEADERS
+    "./include/libdermtiff/dermtiff.hpp"
+    "./include/libdermtiff/dermtiff/common.hpp"
+    "./include/libdermtiff/dermtiff/derm_tiff.hpp"
+    "./include/libdermtiff/dermtiff/io.hpp"
+    "./include/libdermtiff/dermtiff/pencil.hpp"
+)
 
-target_sources(dermtiff PRIVATE
-    "./src/io.cpp"
-    "./src/message.cpp"
-    "./src/pencil.cpp"
-    "./src/type.cpp"
-    "./src/util.cpp"
+add_library(dermtiff ${DERMTIFF_SOURCES})
+
+target_include_directories(dermtiff
+    PRIVATE
+    "../deps/libtiff/"
+    "../build/deps/libtiff/libtiff/"
+    "./include/libdermtiff/"
+    "./src/"
 )
 
 target_link_libraries(dermtiff PRIVATE tiff)
+
+install(
+    TARGETS dermtiff
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(
+    FILES
+    ${DERMTIFF_HEADERS}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)

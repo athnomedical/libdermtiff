@@ -1,7 +1,9 @@
 {
     "editor.formatOnSave": true,
-    "C_Cpp.clang_format_style": "file",
     "C_Cpp.autoAddFileAssociations": false,
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+    "C_Cpp.clang_format_style": "file",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cmake.setBuildTypeOnMultiConfig": true,
     "files.associations": {
         ".clang-format": "yaml",
@@ -10,4 +12,7 @@
     "[cpp]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },
+    "search.exclude": {
+        "deps": true
+    }
 }

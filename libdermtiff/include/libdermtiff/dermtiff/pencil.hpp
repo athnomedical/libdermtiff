@@ -7,10 +7,13 @@
 
 namespace ldt {
     struct Pencil {
-        static const uint8_t MaxNameLength = 64;
+        static const uint8_t max_name_length = 64;
 
-        char name[MaxNameLength + 1] = "\0";
-        uint8_t r = 0, g = 0, b = 0, a = 255;
+        char name[max_name_length + 1] = "\0";
+        uint8_t r                      = 0;
+        uint8_t g                      = 0;
+        uint8_t b                      = 0;
+        uint8_t a                      = 255;
 
         Pencil() = default;
 
@@ -18,11 +21,11 @@ namespace ldt {
 
         Pencil(std::string_view _name, uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255);
 
-        static std::optional<Pencil> Parse(std::string_view str);
+        static std::optional<Pencil> parse(std::string_view str);
 
-        bool setName(std::string_view _name);
+        bool set_name(std::string_view _name);
 
-        std::optional<std::string> toString() const;
+        std::optional<std::string> to_string() const;
 
         bool operator==(const Pencil& other) const noexcept {
             return strcmp(name, other.name) == 0 && r == other.r && g == other.g && b == other.b;

@@ -20,7 +20,7 @@ endif()
 
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
-set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/../bin")
+set(OUTPUT_DIR "${PROJECT_SOURCE_DIR}/bin")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
@@ -36,25 +36,23 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
 
 find_package(ZLIB REQUIRED)
 
+option(tiff-tools "build TIFF tools" OFF)
+option(tiff-tests "build TIFF tests" ON)
+option(tiff-contrib "build TIFF contrib" OFF)
+option(tiff-docs "build TIFF documentation" OFF)
+
+if (APPLE)
+	set(VERSION_FILE_BEFORE ${PROJECT_SOURCE_DIR}/deps/libtiff/VERSION)
+	set(VERSION_FILE_AFTER ${PROJECT_SOURCE_DIR}/deps/libtiff/VERSION.txt)
+	if(EXISTS ${VERSION_FILE_AFTER})
+		execute_process(COMMAND mv ${VERSION_FILE_AFTER} ${VERSION_FILE_BEFORE})
+	endif()
+endif()
+
 add_subdirectory("deps/libtiff")
 add_subdirectory("libdermtiff")
 add_subdirectory("test")
 
-if(MSVC)
-	set_target_properties(tiff PROPERTIES PREFIX "lib")
-	if(NOT (CMAKE_BUILD_TYPE EQUAL "DEBUG"))
-		FILE(STRINGS "${CMAKE_BINARY_DIR}/../deps/libtiff/configure.ac" configure REGEX "^LIBTIFF_.*=")
-		foreach(line ${configure})
-			foreach(var LIBTIFF_CURRENT LIBTIFF_AGE)
-				if(NOT ${var} AND line MATCHES "^${var}=(.*)")
-					set(${var} "${CMAKE_MATCH_1}")
-					break()
-				endif()
-			endforeach()
-		endforeach()
-
-		math(EXPR SO_MAJOR "${LIBTIFF_CURRENT} - ${LIBTIFF_AGE}")
-
-		set_target_properties(tiff PROPERTIES SUFFIX "-${SO_MAJOR}.dll")
-	endif()
+if (APPLE)
+	execute_process(COMMAND mv ${VERSION_FILE_BEFORE} ${VERSION_FILE_AFTER})
 endif()

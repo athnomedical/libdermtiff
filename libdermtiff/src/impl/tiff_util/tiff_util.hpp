@@ -9,14 +9,14 @@
 typedef struct tiff TIFF;
 
 namespace ldt {
-    namespace util {
+    namespace tiff_util {
         // T: uint16_t and uint32_t are implemented.
         // If could not get the field, 0 will be returned.
         template <typename T>
-        T GetField(TIFF* const tiff, uint32_t tag) noexcept;
+        T get_field(TIFF* const tiff, uint32_t tag) noexcept;
 
         template <typename T>
-        std::optional<T> GetFieldOpt(TIFF* const tiff, uint32_t tag) noexcept {
+        std::optional<T> get_field_opt(TIFF* const tiff, uint32_t tag) noexcept {
             if (tiff == nullptr) {
                 return std::nullopt;
             } else {
@@ -28,6 +28,10 @@ namespace ldt {
             }
         }
 
-        std::shared_ptr<TIFF> SafeTIFFOpen(std::string_view path, const char* mode) noexcept;
+        std::shared_ptr<TIFF> open_tiff(std::string_view path, const char* mode) noexcept;
+
+#ifdef _WIN32
+        std::shared_ptr<TIFF> open_tiff_w(std::wstring_view path, const char* mode) noexcept;
+#endif
     }
 }
